@@ -1,0 +1,213 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "cli": {
+    "defaultCollection": "@angular-eslint/schematics"
+  },
+  "version": 1,
+  "newProjectRoot": "projects",
+  "projects": {
+    "ng-electron-zorro-starter": {
+      "root": "",
+      "sourceRoot": "src",
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:application": {
+          "strict": true
+        },
+        "@schematics/angular:component": {
+          "style": "less",
+          "skipTests": true
+        }
+      },
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular-builders/custom-webpack:browser",
+          "options": {
+            "outputPath": "dist",
+            "index": "src/index.html",
+            "main": "src/main.ts",
+            "tsConfig": "src/tsconfig.app.json",
+            "polyfills": "src/polyfills.ts",
+            "inlineStyleLanguage": "less",
+            "assets": [
+              "src/favicon.ico",
+              "src/assets",
+              {
+                "glob": "**/*",
+                "input": "./node_modules/@ant-design/icons-angular/src/inline-svg/",
+                "output": "/assets/"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/monaco-editor",
+                "output": "assets/monaco-editor"
+              }
+            ],
+            "styles": [
+              "node_modules/driver.js/dist/driver.min.css",
+              {
+                "input": "src/styles/default.less",
+                "bundleName": "default",
+                "inject": false
+              },
+              {
+                "input": "src/styles/dark.less",
+                "bundleName": "dark",
+                "inject": false
+              }
+            ],
+            "stylePreprocessorOptions": {
+              "includePaths": ["src/styles/themes"]
+            },
+            "scripts": [
+              "node_modules/driver.js/dist/driver.min.js"
+            ],
+            "customWebpackConfig": {
+              "path": "./angular.webpack.js",
+              "replaceDuplicatePlugins": true
+            }
+          },
+          "configurations": {
+            "dev": {
+              "optimization": false,
+              "outputHashing": "none",
+              "sourceMap": true,
+              "namedChunks": false,
+              "aot": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": false,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.dev.ts"
+                }
+              ]
+            },
+            "production": {
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ]
+            },
+            "web": {
+              "optimization": false,
+              "outputHashing": "none",
+              "sourceMap": true,
+              "namedChunks": false,
+              "aot": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": false,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.web.ts"
+                }
+              ]
+            },
+            "web-production": {
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.web.prod.ts"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular-builders/custom-webpack:dev-server",
+          "options": {
+            "browserTarget": "ng-electron-zorro-starter:build"
+          },
+          "configurations": {
+            "dev": {
+              "browserTarget": "ng-electron-zorro-starter:build:dev"
+            },
+            "production": {
+              "browserTarget": "ng-electron-zorro-starter:build:production"
+            },
+            "web": {
+              "browserTarget": "ng-electron-zorro-starter:build:web"
+            },
+            "web-production": {
+              "browserTarget": "ng-electron-zorro-starter:build:web-production"
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "ng-electron-zorro-starter:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-builders/custom-webpack:karma",
+          "options": {
+            "main": "src/test.ts",
+            "polyfills": "src/polyfills-test.ts",
+            "tsConfig": "src/tsconfig.spec.json",
+            "karmaConfig": "src/karma.conf.js",
+            "inlineStyleLanguage": "less",
+            "scripts": [],
+            "styles": [
+              "src/styles.less"
+            ],
+            "assets": [
+              "src/favicon.ico",
+              "src/assets"
+            ],
+            "customWebpackConfig": {
+              "path": "./angular.webpack.js",
+              "replaceDuplicatePlugins": true
+            }
+          }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
+            ]
+          }
+        }
+      }
+    },
+    "ng-electron-zorro-starter-e2e": {
+      "root": "e2e",
+      "projectType": "application",
+      "architect": {
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "e2e/**/*.ts"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "defaultProject": "ng-electron-zorro-starter"
+}

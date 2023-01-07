@@ -1,0 +1,95 @@
+{
+  "PAGES": {
+      "LOGIN": {
+        "TITLE": "Centralised Management System",
+        "DESCRIPTION": "Please provide your credential to get started!",
+        "FORM_TITLE": "Sign In",
+        "USERNAME_PLACEHOLDER": "username",
+        "PASSWORD_PLACEHOLDER": "password",
+        "SUBMIT_BTN": "Log In",
+        "WARNING": "Please type in your username and password"
+      },
+      "HOME": {
+          "TITLE": "App works !",
+          "GO_TO_DETAIL": "Go to Detail"
+      },
+      "DETAIL": {
+        "TITLE": "Detail page !",
+        "BACK_TO_HOME": "Back to Home"
+    }
+  },
+  "COMPONENTS": {
+    "HEAD_RIGHT_MENU": {
+      "LOCK_SCREEN": "Lock Screen",
+      "SEARCH": "Search",
+      "ENTER_FULLSCREEN": "Enter Fullscreen",
+      "EXIT_FULLSCREEN": "Exit Fullscreen"
+    },
+    "SETTING_DRAWER": {
+      "THEME_COLOR": "Theme Color",
+      "SIDEBAR_COLOR": "Sidebar Color",
+      "LAYOUT": "Layout",
+      "SIDE_MENU_LAYOUT": "Side Menu Layout",
+      "TOP_MENU_LAYOUT": "Top Menu Layout",
+      "HYBRID_MENU_LAYOUT": "Hybrid Menu Layout",
+      "FIXED_TABBAR": "Fixed Tabbar",
+      "FIXED_TOOLBAR": "Fixed Toolbar",
+      "FIXED_LEFT_NAVBAR": "Fixed Left Sidebar",
+      "SPLIT_NAVBAR": "Split Navbar",
+      "CONTENT_AREA": "Content Area",
+      "SHOW_TOOLBAR": "Show ToolBar",
+      "SHOW_FOOTER": "Show Footer",
+      "SHOW_SIDEBAR": "Show Sidebar",
+      "SHOW_SIDEBAR_HEADER": "Show Sidebar Header",
+      "COLOR_MODE": "Color Mode",
+      "DARK_MODE": "Dark Mode",
+      "BLINDNESS_COLOR_MODE": "Blindness Color Mode"
+    },
+    "TAB": {
+      "REFRESH": "Refresh",
+      "CLOSE_TAB": "Close",
+      "CLOSE_OTHER_TAB": "Close Other Tab(s)",
+      "CLOSE_RIGHT_SIDE_TAB": "Close Tabs To The Right",
+      "CLOSE_LEFT_SIDE_TAB": "Close Tabs To The Left"
+    },
+    "LOCKSCREEN": {
+      "TITLE": "Click To Unlock",
+      "CANCEL_BTN": "Cancel",
+      "LOGIN_BTN": "Go To Login Page",
+      "CONFIRM_BTN": "Confirm",
+      "ERROR": "Incorrect Password",
+      "REQUIRED": "Password is required!",
+      "PASSWORD_PLACEHOLDER": "Lockscreen password"
+    }
+  },
+  "WIDGETS": {
+    "CHANGE_PASSWORD": {
+      "TITLE": "Update Password",
+      "CURRENT_PASSWORD": "Current Password",
+      "NEW_PASSWORD": "New Password",
+      "CONFIRM_PASSWORD": "Confirm Password"
+    },
+    "MODAL": {
+      "CONFIRM_BTN": "Confirm",
+      "CANCEL_BTN": "Cancel"
+    },
+    "LIST": {
+      "CHANGE_PASSWORD": "Change Password",
+      "CLEAR_CACHE": "Clear Cache",
+      "LOCK_SCREEN": "Lock Screen",
+      "LOGOUT": "Logout"
+    },
+    "SEARCH": {
+      "INPUT_PLACEHOLDER": "Search",
+      "CONFIRM": "Confirm",
+      "TOGGLE": "Toggle Up & Down",
+      "CLOSE": "Close"
+    },
+    "LOCKSCREEN": {
+      "TITLE": "Lock Screen",
+      "INPUT": "Lock Screen Password",
+      "PASSWORD_PLACEHOLDER": "Please enter lockscreen password",
+      "LOCK_BTN": "Lock"
+    }
+  }
+}
