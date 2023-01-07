@@ -2,7 +2,7 @@
   "name": "ng-electron-zorro-starter",
   "version": "11.2.0",
   "description": "Angular 14 with Electron 21 <Ant Design Pro Template Starter> (Typescript + SASS + Hot Reload)",
-  "homepage": "https://github.com/maximegris/ng-electron-zorro-starter",
+  "homepage": "https://github.com/devzepto/ng-electron-zorro-starter",
   "author": {
     "name": "Devzepto",
     "email": "devzepto@gmail.com"
