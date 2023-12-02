@@ -210,7 +210,7 @@ export class ModalWrapService {
       },
       nzClosable: true,
       nzWidth: 720,
-      nzComponentParams: {
+      nzData: {
         params,
       }, // 参数中的属性将传入nzContent实例中
     };

@@ -14,6 +14,7 @@ import { StartupService } from '@core/startup/startup.service';
 import { SharedModule } from '@shared/shared.module';
 import { LoginModalModule } from '@widget/biz-widget/login/login-modal.module';
 import { PasswordStrengthMeterModule } from 'angular-password-strength-meter';
+import { DEFAULT_PSM_OPTIONS } from 'angular-password-strength-meter/zxcvbn';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -112,7 +113,7 @@ const APPINIT_PROVIDES = [
     CoreModule,
     SharedModule,
     LoginModalModule,
-    PasswordStrengthMeterModule.forRoot(),
+    PasswordStrengthMeterModule.forRoot(DEFAULT_PSM_OPTIONS),
     AppRoutingModule,
     TranslateModule.forRoot({
       defaultLanguage: environment.i18n,
