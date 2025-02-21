@@ -25,5 +25,5 @@ const menuNav: Menu[] = [
     menuType: 'C',
     path: '/default/welcome',
     code: ''
-  },
+  }
 ];

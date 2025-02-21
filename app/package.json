@@ -1,11 +1,11 @@
 {
-  "name": "ng-electron-zorro-starter",
+  "name": "angular-electron",
   "description": "Angular Electron sample",
   "author": {
     "name": "Maxime GRIS",
     "email": "maxime.gris@gmail.com"
   },
-  "version": "11.2.0",
+  "version": "14.0.1",
   "main": "main.js",
   "private": true,
   "dependencies": {

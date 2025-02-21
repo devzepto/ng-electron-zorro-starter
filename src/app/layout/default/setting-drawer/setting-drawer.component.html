@@ -1,119 +1,144 @@
-<div (cdkDragEnded)="dragEnd()" (cdkDragStarted)="dragging = true" cdkDragLockAxis="y" cdkDrag class="drawer-handle" id="drawer-handle" [class.open]="isCollapsed" (click)="changeCollapsed()">
-  <ng-container *ngIf="!isCollapsed; then settingIcon; else closeIcon"></ng-container>
-  <ng-template #settingIcon>
-    <i nz-icon nzType="setting" nzTheme="outline"></i>
-  </ng-template>
-  <ng-template #closeIcon>
-    <i nz-icon nzType="close" nzTheme="outline"></i>
-  </ng-template>
+<div id="drawer-handle" class="drawer-handle" cdkDrag cdkDragLockAxis="y" [class.open]="isCollapsed" (cdkDragEnded)="dragEnd()" (cdkDragStarted)="dragging = true" (click)="changeCollapsed()">
+  @if (!isCollapsed) {
+    <i nz-icon nzTheme="outline" nzType="setting"></i>
+  } @else {
+    <i nz-icon nzTheme="outline" nzType="close"></i>
+  }
 </div>
 <nz-drawer [nzClosable]="false" [nzWidth]="300" [(nzVisible)]="isCollapsed" (nzOnClose)="isCollapsed = !isCollapsed">
   <ng-container *nzDrawerContent>
-    <div class="m-b-24" *ngIf="_themesOptions.mode !== 'mixi'">
-      <h3 class="title">{{'COMPONENTS.SETTING_DRAWER.SIDEBAR_COLOR' | translate}}</h3>
-      <div class="block-checkbox">
-        <div *ngFor="let theme of themes" class="item" nz-tooltip [nzTooltipTitle]="theme.title" (click)="changeTheme(theme)">
-          <img [src]="theme.image" [alt]="theme.title" />
-          <div class="select-icon" *ngIf="theme.isChecked">
-            <i nz-icon nzType="check" nzTheme="outline"></i>
-          </div>
+    @if (_themesOptions.mode !== 'mixin') {
+      <div class="m-b-24">
+        <h3 class="title">{{'COMPONENTS.SETTING_DRAWER.SIDEBAR_COLOR' | translate}}</h3>
+        <div class="block-checkbox">
+          @for (theme of themes; track theme) {
+            <div class="item" nz-tooltip [nzTooltipTitle]="theme.title" (click)="changeTheme(theme)">
+              <img [alt]="theme.title" [src]="theme.image" />
+              @if (theme.isChecked) {
+                <div class="select-icon">
+                  <i nz-icon nzTheme="outline" nzType="check"></i>
+                </div>
+              }
+            </div>
+          }
         </div>
       </div>
-    </div>
+    }
 
-    <div [class.m-t-25]="_themesOptions.mode !== 'mixi'" class="m-b-24 theme-color">
+    <div class="m-b-24 theme-color" [class.m-t-25]="_themesOptions.mode !== 'mixin'">
       <h3 class="title">{{'COMPONENTS.SETTING_DRAWER.THEME_COLOR' | translate}}</h3>
       <div class="content">
-        <div *ngFor="let color of colors" class="color-block" nz-tooltip [nzTooltipTitle]="color.title" [style.background]="color.color" (click)="changePrimaryColor(color)">
-          <i *ngIf="color.isChecked" nz-icon nzType="check" nzTheme="outline"></i>
-        </div>
+        @for (color of colors; track color) {
+          <div class="color-block" nz-tooltip [nzTooltipTitle]="color.title" [style.background]="color.color" (click)="changePrimaryColor(color)">
+            @if (color.isChecked) {
+              <i nz-icon nzTheme="outline" nzType="check"></i>
+            }
+          </div>
+        }
       </div>
     </div>
 
-    <nz-divider></nz-divider>
+    <nz-divider />
 
     <div class="m-b-24">
       <h3 class="title">{{'COMPONENTS.SETTING_DRAWER.LAYOUT' | translate}}</h3>
       <div class="block-checkbox">
-        <div (click)="changeMode(mode)" *ngFor="let mode of modes" class="item" nz-tooltip [nzTooltipTitle]="mode.title | translate">
-          <img [src]="mode.image" [alt]="mode.title" />
-          <div class="select-icon" *ngIf="mode.isChecked">
-            <i nz-icon nzType="check" nzTheme="outline"></i>
+        @for (mode of modes; track mode) {
+          <div class="item" nz-tooltip [nzTooltipTitle]="mode.title | translate" (click)="changeMode(mode)">
+            <img [alt]="mode.title" [src]="mode.image" />
+            @if (mode.isChecked) {
+              <div class="select-icon">
+                <i nz-icon nzTheme="outline" nzType="check"></i>
+              </div>
+            }
           </div>
-        </div>
+        }
       </div>
     </div>
     <nz-list [nzSplit]="false">
       <nz-list-item [nzActions]="[fixedTabAction]">{{'COMPONENTS.SETTING_DRAWER.FIXED_TABBAR' | translate}}</nz-list-item>
       <ng-template #fixedTabAction>
-        <nz-switch [nzDisabled]="!_themesOptions.fixedHead" (ngModelChange)="changeFixed($event, 'fixedTab')" [ngModel]="_themesOptions.fixedTab" nzSize="small"></nz-switch>
+        <nz-switch nzSize="small" [ngModel]="_themesOptions.fixedTab" [nzDisabled]="!_themesOptions.fixedHead" (ngModelChange)="changeFixed($event, 'fixedTab')" />
       </ng-template>
     </nz-list>
     <nz-list [nzSplit]="false">
       <nz-list-item [nzActions]="[fixedHeadAction]">{{'COMPONENTS.SETTING_DRAWER.FIXED_TOOLBAR' | translate}}</nz-list-item>
       <ng-template #fixedHeadAction>
-        <nz-switch [ngModel]="_themesOptions.fixedHead" (ngModelChange)="changeFixed($event, 'fixedHead')" nzSize="small"></nz-switch>
+        <nz-switch nzSize="small" [ngModel]="_themesOptions.fixedHead" (ngModelChange)="changeFixed($event, 'fixedHead')" />
       </ng-template>
     </nz-list>
 
     <nz-list [nzSplit]="false">
       <nz-list-item [nzActions]="[fixedLeftNavAction]">{{'COMPONENTS.SETTING_DRAWER.FIXED_LEFT_NAVBAR' | translate}}</nz-list-item>
       <ng-template #fixedLeftNavAction>
-        <nz-switch [ngModel]="_themesOptions.fixedLeftNav" (ngModelChange)="changeFixed($event, 'fixedLeftNav')" nzSize="small"></nz-switch>
+        <nz-switch nzSize="small" [ngModel]="_themesOptions.fixedLeftNav" (ngModelChange)="changeFixed($event, 'fixedLeftNav')" />
+      </ng-template>
+    </nz-list>
+
+    <nz-list [nzSplit]="false">
+      <nz-list-item [nzActions]="[isShowTabTpl]">{{'COMPONENTS.SETTING_DRAWER.SPLIT_NAVBAR' | translate}}</nz-list-item>
+      <ng-template #isShowTabTpl>
+        <nz-switch nzSize="small" [ngModel]="_themesOptions.isShowTab" (ngModelChange)="changeFixed($event, 'isShowTab')" />
       </ng-template>
     </nz-list>
 
     <nz-list [nzSplit]="false">
       <nz-list-item [nzActions]="[splitNavAction]">{{'COMPONENTS.SETTING_DRAWER.SPLIT_NAVBAR' | translate}}</nz-list-item>
       <ng-template #splitNavAction>
-        <nz-switch [ngModel]="_themesOptions.splitNav" (ngModelChange)="changeFixed($event, 'splitNav')" nzSize="small"></nz-switch>
+        <nz-switch nzSize="small" [ngModel]="_themesOptions.splitNav" (ngModelChange)="changeFixed($event, 'splitNav')" />
       </ng-template>
     </nz-list>
 
-    <nz-divider></nz-divider>
+    <nz-divider />
 
     <div class="m-b-24">
       <h3 class="title">{{'COMPONENTS.SETTING_DRAWER.CONTENT_AREA' | translate}}</h3>
       <nz-list [nzSplit]="false">
         <nz-list-item [nzActions]="[topAreaAction]">{{'COMPONENTS.SETTING_DRAWER.SHOW_TOOLBAR' | translate}}</nz-list-item>
         <ng-template #topAreaAction>
-          <nz-switch (ngModelChange)="changeFixed($event, 'hasTopArea')" [ngModel]="_themesOptions.hasTopArea" nzSize="small"></nz-switch>
+          <nz-switch nzSize="small" [ngModel]="_themesOptions.hasTopArea" (ngModelChange)="changeFixed($event, 'hasTopArea')" />
         </ng-template>
       </nz-list>
       <nz-list [nzSplit]="false">
         <nz-list-item [nzActions]="[footerAreaAction]">{{'COMPONENTS.SETTING_DRAWER.SHOW_FOOTER' | translate}}</nz-list-item>
         <ng-template #footerAreaAction>
-          <nz-switch (ngModelChange)="changeFixed($event, 'hasFooterArea')" [ngModel]="_themesOptions.hasFooterArea" nzSize="small"></nz-switch>
+          <nz-switch nzSize="small" [ngModel]="_themesOptions.hasFooterArea" (ngModelChange)="changeFixed($event, 'hasFooterArea')" />
         </ng-template>
       </nz-list>
       <nz-list [nzSplit]="false">
         <nz-list-item [nzActions]="[navAreaAction]">{{'COMPONENTS.SETTING_DRAWER.SHOW_SIDEBAR' | translate}}</nz-list-item>
         <ng-template #navAreaAction>
-          <nz-switch (ngModelChange)="changeFixed($event, 'hasNavArea')" [ngModel]="_themesOptions.hasNavArea" nzSize="small"></nz-switch>
+          <nz-switch nzSize="small" [ngModel]="_themesOptions.hasNavArea" (ngModelChange)="changeFixed($event, 'hasNavArea')" />
         </ng-template>
       </nz-list>
       <nz-list [nzSplit]="false">
         <nz-list-item [nzActions]="[navHeadAreaAction]">{{'COMPONENTS.SETTING_DRAWER.SHOW_SIDEBAR_HEADER' | translate}}</nz-list-item>
         <ng-template #navHeadAreaAction>
-          <nz-switch (ngModelChange)="changeFixed($event, 'hasNavHeadArea')" [ngModel]="_themesOptions.hasNavHeadArea" nzSize="small"></nz-switch>
+          <nz-switch nzSize="small" [ngModel]="_themesOptions.hasNavHeadArea" (ngModelChange)="changeFixed($event, 'hasNavHeadArea')" />
         </ng-template>
       </nz-list>
     </div>
 
-    <nz-divider></nz-divider>
+    <nz-divider />
 
     <div class="m-b-24">
       <h3 class="title">{{'COMPONENTS.SETTING_DRAWER.COLOR_MODE' | translate}}</h3>
       <nz-list [nzSplit]="false">
         <nz-list-item [nzActions]="[layoutAction]">{{'COMPONENTS.SETTING_DRAWER.DARK_MODE' | translate}}</nz-list-item>
         <ng-template #layoutAction>
-          <nz-switch [ngModel]="_isNightTheme" (ngModelChange)="changeNightTheme($event)" nzSize="small"></nz-switch>
+          <nz-switch nzSize="small" [ngModel]="_isNightTheme" (ngModelChange)="changeNightTheme($event)"></nz-switch>
         </ng-template>
       </nz-list>
       <nz-list [nzSplit]="false">
         <nz-list-item [nzActions]="[otherAction]">{{'COMPONENTS.SETTING_DRAWER.BLINDNESS_COLOR_MODE' | translate}}</nz-list-item>
         <ng-template #otherAction>
-          <nz-switch (ngModelChange)="changeWeakMode($event)" [ngModel]="_themesOptions.colorWeak" nzSize="small"></nz-switch>
+          <nz-switch nzSize="small" [ngModel]="_themesOptions.colorWeak" (ngModelChange)="changeSpecialTheme($event, 'color-weak')" />
+        </ng-template>
+      </nz-list>
+      <nz-list [nzSplit]="false">
+        <nz-list-item [nzActions]="[greyAction]">{{'COMPONENTS.SETTING_DRAWER.GREY_MODE' | translate}}</nz-list-item>
+        <ng-template #greyAction>
+          <nz-switch nzSize="small" [ngModel]="_themesOptions.greyTheme" (ngModelChange)="changeSpecialTheme($event, 'grey-theme')" />
         </ng-template>
       </nz-list>
     </div>

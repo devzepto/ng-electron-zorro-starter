@@ -1,23 +1,46 @@
 <div>
   <h2 class="m-b-8" [class.is-over-model]="isOverModel">{{'PAGES.LOGIN.FORM_TITLE' | translate}}</h2>
   <div class="full-with">
-    <form nz-form class="login-form-wrap" [formGroup]="validateForm" (ngSubmit)="submitForm()">
+    <form class="login-form-wrap" nz-form [formGroup]="validateForm" (ngSubmit)="submitForm()">
       <nz-form-item>
         <nz-form-control [nzErrorTip]="'PAGES.LOGIN.WARNING' | translate">
-          <input nzSize="large" [placeholder]="'PAGES.LOGIN.USERNAME_PLACEHOLDER' | translate" type="text" nz-input formControlName="userName" placeholder="用户名" />
+          <input type="text" formControlName="userName" nz-input nzSize="large" [placeholder]="'PAGES.LOGIN.USERNAME_PLACEHOLDER' | translate" [placeholder]="'没有账号密码直接登陆'" />
         </nz-form-control>
       </nz-form-item>
       <nz-form-item>
         <nz-form-control [nzErrorTip]="'PAGES.LOGIN.WARNING' | translate">
           <nz-input-group [nzSize]="'large'" [nzSuffix]="suffixTemplate">
-            <input autocomplete="on" [placeholder]="'PAGES.LOGIN.PASSWORD_PLACEHOLDER' | translate" [type]="passwordVisible ? 'text' : 'password'" nz-input formControlName="password" placeholder="密码" />
+            <input autocomplete="on" formControlName="password" nz-input [placeholder]="'PAGES.LOGIN.PASSWORD_PLACEHOLDER' | translate" [type]="passwordVisible ? 'text' : 'password'" />
           </nz-input-group>
           <ng-template #suffixTemplate>
             <i nz-icon [nzType]="passwordVisible ? 'eye-invisible' : 'eye'" (click)="passwordVisible = !passwordVisible"></i>
           </ng-template>
         </nz-form-control>
       </nz-form-item>
-      <button nz-button nzSize="large" class="full-with m-t-15 btn" [nzType]="'primary'">{{'PAGES.LOGIN.SUBMIT_BTN' | translate}}</button>
+      <div nz-row nzJustify="space-between">
+        <div nz-col>
+          <label formControlName="remember" nz-checkbox>
+            <span>{{'PAGES.LOGIN.REMEMBER_ME' | translate}}</span>
+          </label>
+        </div>
+        <div nz-col>
+          <a class="operate-text">{{'PAGES.LOGIN.FORGET_PASSWORD' | translate}}</a>
+        </div>
+      </div>
+      <button class="full-with m-t-15 btn" nz-button nzSize="large" [nzType]="'primary'">{{'PAGES.LOGIN.SUBMIT_BTN' | translate}}</button>
+      <div class="m-t-15" nz-row nzJustify="space-between">
+        <button class="m-b-8" nz-button nz-col nzType="default" [nzSm]="7" [nzXs]="24" (click)="goOtherWay(typeEnum.Phone)">{{'PAGES.LOGIN.MOBILE_PHONE' | translate}}</button>
+        <button class="m-b-8" nz-button nz-col nzType="default" [nzSm]="7" [nzXs]="24" (click)="goOtherWay(typeEnum.Qr)">{{'PAGES.LOGIN.QRCODE' | translate}}</button>
+        <button class="m-b-8" nz-button nz-col nzType="default" [nzSm]="7" [nzXs]="24" (click)="goOtherWay(typeEnum.Register)">{{'PAGES.LOGIN.REGISTER' | translate}}</button>
+      </div>
+      <nz-divider nzPlain [nzText]="'PAGES.LOGIN.OTHER_LOGIN_METHOD' | translate"></nz-divider>
+      <div nz-row nzJustify="space-around">
+        <i nz-col nz-icon nzTheme="fill" nzType="alipay-circle"></i>
+        <i nz-col nz-icon nzTheme="fill" nzType="taobao-circle"></i>
+        <i nz-col nz-icon nzTheme="fill" nzType="weibo-circle"></i>
+        <i nz-col nz-icon nzTheme="fill" nzType="qq-circle"></i>
+        <i nz-col nz-icon nzTheme="fill" nzType="google-circle"></i>
+      </div>
     </form>
   </div>
 </div>

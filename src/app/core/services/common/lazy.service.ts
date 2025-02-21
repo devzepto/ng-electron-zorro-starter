@@ -1,5 +1,5 @@
 import { DOCUMENT } from '@angular/common';
-import { Inject, Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { filter, share } from 'rxjs/operators';
 
@@ -10,6 +10,7 @@ export interface LazyResult {
   status: 'ok' | 'error' | 'loading';
   error?: NzSafeAny;
 }
+/*https://netbasal.com/loading-external-libraries-on-demand-in-angular-9dad45701801*/
 // 使用方式：
 // this.lazy.load(["https://unpkg.com/driver.js/dist/driver.min.js", "https://unpkg.com/driver.js/dist/driver.min.css"]).then(() => {
 
@@ -21,8 +22,7 @@ export class LazyService {
   private list: { [key: string]: boolean } = {};
   private cached: { [key: string]: LazyResult } = {};
   private _notify: BehaviorSubject<LazyResult[]> = new BehaviorSubject<LazyResult[]>([]);
-
-  constructor(@Inject(DOCUMENT) private doc: NzSafeAny) {}
+  private readonly doc = inject(DOCUMENT);
 
   get change(): Observable<LazyResult[]> {
     return this._notify.asObservable().pipe(

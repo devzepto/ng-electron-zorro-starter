@@ -1,9 +1,12 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, TemplateRef } from '@angular/core';
+import { NgClass, NgTemplateOutlet } from '@angular/common';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, inject, Input, OnChanges, OnInit, Output, SimpleChanges, TemplateRef } from '@angular/core';
 
 import { NzSafeAny } from 'ng-zorro-antd/core/types';
-import { NzResizeEvent } from 'ng-zorro-antd/resizable';
-import { NzTableQueryParams, NzTableSize } from 'ng-zorro-antd/table';
+import { NzResizeEvent, NzResizableModule } from 'ng-zorro-antd/resizable';
+import { NzTableQueryParams, NzTableSize, NzTableModule } from 'ng-zorro-antd/table';
 
+import { MapPipe } from '../../pipes/map.pipe';
+import { TableFiledPipe } from '../../pipes/table-filed.pipe';
 export interface TableHeader {
   title: string; // 表头名称
   field?: string; // 字段
@@ -53,7 +56,9 @@ export interface SortFile {
   templateUrl: './ant-table.component.html',
   styleUrls: ['./ant-table.component.less'],
   providers: [{ provide: AntTableComponentToken, useExisting: AntTableComponent }],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true,
+  imports: [NzTableModule, NzResizableModule, NgClass, NgTemplateOutlet, MapPipe, TableFiledPipe]
 })
 export class AntTableComponent implements OnInit, OnChanges {
   _dataList!: NzSafeAny[];
@@ -102,8 +107,7 @@ export class AntTableComponent implements OnInit, OnChanges {
   @Output() readonly sortFn: EventEmitter<SortFile> = new EventEmitter<SortFile>();
   indeterminate: boolean = false;
   allChecked: boolean = false;
-
-  constructor(private cdr: ChangeDetectorRef) {}
+  private cdr = inject(ChangeDetectorRef);
 
   setScrollConfig(value: AntTableConfig): void {
     if (value && !value.needNoScroll) {

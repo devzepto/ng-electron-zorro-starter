@@ -1,34 +1,32 @@
-@import "../minireset.less";
-@import "../../../node_modules/ng-zorro-antd/resizable/style/entry.less";
+@import './minireset.less';
+@import '../../../node_modules/ng-zorro-antd/resizable/style/entry.less';
 
 @layout-header-height: 48px;
 @layout-header-padding: 0;
-@menu-collapsed-width: 48px;
+
 @layout-trigger-height: 40px;
+
 // 如果存在所有主题通用的样式变量,基本样式文件并在每个主题样式定制文件中引入它：
 * {
   box-sizing: border-box;
 }
 
-
 body {
   // min-width: 570px;
 }
-
 
 img {
   display: inline-block;
   width: 100%;
 }
 
-
 p {
   margin: 0;
   padding: 0;
 }
 
-
-audio, video {
+audio,
+video {
   outline: none;
 }
 
@@ -36,20 +34,16 @@ input:focus {
   outline: none;
 }
 
-a {
-  color: inherit;
-
-  &:hover {
-    color: inherit;
-    // text-decoration: underline;
-  }
-}
-
 .pagination a:hover {
   text-decoration: none;
 }
 
-h1, h2, h3, h4, h5, h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   margin-bottom: 0;
 }
 
@@ -62,13 +56,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .text-break {
-  word-break: break-all
+  word-break: break-all;
 }
 
 .full-height {
   height: 100%;
 }
-
 
 .full-with {
   width: 100% !important;
@@ -93,27 +86,29 @@ h1, h2, h3, h4, h5, h6 {
 //  word-wrap: normal;
 //}
 
-.clearfix:after {
-  clear: both;
-  content: '.';
+.clearfix::after {
   display: block;
+  clear: both;
   height: 0;
   visibility: hidden;
+  content: '.';
+}
+
+.grey-theme {
+  filter: grayscale(100%);
 }
 
 .color-weak {
   filter: invert(80%) !important;
 }
 
-
 .wrap {
   width: 980px;
   margin: 0 auto;
 }
 
-
 .text-left {
-  text-align: left !important;;
+  text-align: left !important;
 }
 
 .text-center {
@@ -121,7 +116,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .text-right {
-  text-align: right !important;;
+  text-align: right !important;
 }
 
 .pull-left {
@@ -168,6 +163,10 @@ h1, h2, h3, h4, h5, h6 {
   margin-right: 8px !important;
 }
 
+.m-r-10 {
+  margin-right: 10px !important;
+}
+
 .m-r-15 {
   margin-right: 15px !important;
 }
@@ -195,6 +194,7 @@ h1, h2, h3, h4, h5, h6 {
 .m-10 {
   margin: 10px !important;
 }
+
 .m-b-4 {
   margin-bottom: 4px !important;
 }
@@ -243,7 +243,6 @@ h1, h2, h3, h4, h5, h6 {
   margin-left: 10px !important;
 }
 
-
 .m-l-15 {
   margin-left: 15px !important;
 }
@@ -288,7 +287,6 @@ h1, h2, h3, h4, h5, h6 {
   margin-top: 30px !important;
 }
 
-
 .m-l-18 {
   margin-left: 18px !important;
 }
@@ -305,7 +303,6 @@ h1, h2, h3, h4, h5, h6 {
   margin-left: 50px !important;
 }
 
-
 .p-0 {
   padding: 0 !important;
 }
@@ -317,7 +314,6 @@ h1, h2, h3, h4, h5, h6 {
 .p-16 {
   padding: 16px !important;
 }
-
 
 .p-24 {
   padding: 24px !important;
@@ -339,7 +335,6 @@ h1, h2, h3, h4, h5, h6 {
   padding-top: 24px !important;
 }
 
-
 .p-l-0 {
   padding-left: 0 !important;
 }
@@ -347,7 +342,6 @@ h1, h2, h3, h4, h5, h6 {
 .p-l-8 {
   padding-left: 8px !important;
 }
-
 
 .p-l-10 {
   padding-left: 10px !important;
@@ -364,7 +358,6 @@ h1, h2, h3, h4, h5, h6 {
 .p-l-25 {
   padding-left: 25px !important;
 }
-
 
 .p-l-35 {
   padding-left: 35px !important;
@@ -447,18 +440,17 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .animate-03 {
-  transition: all .3s;
+  transition: all 0.3s;
 }
 
-.clear-fix:after {
-  content: '';
-  clear: both;
+.clear-fix::after {
   display: block;
+  clear: both;
+  content: '';
 }
-
 
 .default-theme {
-  background: #ffffff;
+  background: #fff;
 }
 
 .night-theme {
@@ -482,7 +474,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .text-error {
-  color: #f5222d !important
+  color: #f5222d !important;
 }
 
 .grey-color {
@@ -503,6 +495,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .operate-text {
   .hand-model;
+
   margin-right: 5px;
 }
 
@@ -512,13 +505,13 @@ h1, h2, h3, h4, h5, h6 {
 
 .center-fn(@col:center,@row:center) {
   display: flex;
-  justify-content: @col;
   align-items: @row;
+  justify-content: @col;
 }
 
 .center {
   display: flex;
-  .center-fn()
+  .center-fn();
 }
 
 .flex {
@@ -538,21 +531,20 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .end-start-center {
-  .center-fn(flex-end)
+  .center-fn(flex-end);
 }
 
 .left-start-center {
-  .center-fn(flex-start)
+  .center-fn(flex-start);
 }
 
 .space-between {
-  .center-fn(space-between)
+  .center-fn(space-between);
 }
 
 .space-around {
-  .center-fn(space-around)
+  .center-fn(space-around);
 }
-
 
 .bg-color-no {
   background: none !important;
@@ -572,7 +564,7 @@ h1, h2, h3, h4, h5, h6 {
 .normal-table-wrap {
   margin: 27px 27px 0;
 
-  /*列表顶部样式*/
+  /* 列表顶部样式 */
 
   .ant-pro-table-toolbar {
     display: flex;
@@ -583,8 +575,8 @@ h1, h2, h3, h4, h5, h6 {
       flex: 1 1;
       font-size: 16px;
       line-height: 24px;
+      opacity: 0.85;
       will-change: transform;
-      opacity: .85;
     }
 
     .ant-pro-table-toolbar-option {
@@ -606,20 +598,12 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
-
-/*覆盖zorro样式*/
+/* 覆盖zorro样式 */
 
 // 对话框增加滚动条
 .ant-modal-body {
-  overflow: auto;
   max-height: 600px;
-}
-
-.ant-modal-close-x {
-  display: inline-block;
-  width: 96px;
-  height: 56px;
-  line-height: 56px
+  overflow: auto;
 }
 
 .fullscreen-modal {
@@ -631,8 +615,8 @@ h1, h2, h3, h4, h5, h6 {
     bottom: 0 !important;
     left: 0 !important;
     width: 100% !important;
-    height: 100%;
     max-width: initial;
+    height: 100%;
     padding: 0;
     transform: translate3d(0, 0, 0) !important;
 
@@ -641,14 +625,16 @@ h1, h2, h3, h4, h5, h6 {
       transform: translate3d(0, 0, 0) !important;
 
       .ant-modal-body {
-        max-height: none;
         height: calc(100% - 55px - 53px);
+        max-height: none;
       }
     }
   }
 }
 
-.ant-menu-inline, .ant-menu-vertical, .ant-menu-vertical-left {
+.ant-menu-inline,
+.ant-menu-vertical,
+.ant-menu-vertical-left {
   border: none;
 }
 
@@ -660,9 +646,63 @@ input[nz-input] {
   .animate-bg-0;
 }
 
-//
-//.overflow-dots {
-//  overflow: hidden;
-//  white-space: nowrap;
-//  text-overflow: ellipsis;
-//}
+// zorro更新日志中16.2.2版本的中内置 cdk-overlay 样式影响，删除这段样式会导致拖拽modal的示例demo，同时弹出2个对话框，点击不同的对话框，z-index不生效
+.cdk-global-overlay-wrapper {
+  z-index: unset;
+  position: unset;
+  display: unset;
+}
+
+// https://github.com/angular/angular/pull/42608
+@keyframes progress-bar-load-third {
+  0% {
+    transform: translateX(-33.3vw);
+  }
+
+  100% {
+    transform: translateX(100vw);
+  }
+}
+
+@keyframes progress-bar-grad-colours {
+  0% {
+    background: linear-gradient(90deg, rgb(232 128 152 / 0%) 0%, #e88098 30%, #e88098 50%, #e88098 70%, rgb(232 128 152 / 0%) 100%);
+  }
+
+  20% {
+    background: linear-gradient(90deg, rgb(132 190 190 / 0%) 0%, #84bebe 30%, #84bebe 50%, #84bebe 70%, rgb(132 190 190 / 0%) 100%);
+  }
+
+  40% {
+    background: linear-gradient(90deg, rgb(233 135 36 / 0%) 0%, #e98724 30%, #e98724 50%, #e98724 70%, rgb(233 135 36 / 0%) 100%);
+  }
+
+  60% {
+    background: linear-gradient(90deg, rgb(175 201 78 / 0%) 0%, #afc94e 30%, #afc94e 50%, #afc94e 70%, rgb(175 201 78 / 0%) 100%);
+  }
+
+  80% {
+    background: linear-gradient(90deg, rgb(98 151 164 / 0%) 0%, #6297a4 30%, #6297a4 50%, #6297a4 70%, rgb(98 151 164 / 0%) 100%);
+  }
+}
+
+.ng17color {
+  background: linear-gradient(to right, #8514f5, #f637e3, #fa2c05);
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@keyframes textGradientAnimation {
+  0% {
+    background-position: 0% 50%;
+  }
+  33% {
+    background-position: 100% 50%;
+  }
+  66% {
+    background-position: 200% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}

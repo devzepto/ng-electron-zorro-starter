@@ -1,12 +1,14 @@
 <ng-container *ngTemplateOutlet="headRight"></ng-container>
 <ng-template #headRight>
-  <div class="bst-header-wrap" id="tools">
-    <span *appScreenLessHidden="'375'" (click)="lockScreen()" class="bst-header-icon" nz-tooltip nzTooltipTitle="{{'COMPONENTS.HEAD_RIGHT_MENU.LOCK_SCREEN' | translate}}" nzTooltipPlacement="bottom">
-      <i nz-icon nzType="lock" nzTheme="outline"></i>
-    </span>
+  <div id="tools" class="bst-header-wrap">
+    <!--      <span *appScreenLessHidden="'375'" (click)="lockScreen()" class="bst-header-icon" nz-tooltip nzTooltipTitle="锁屏"
+            nzTooltipPlacement="bottom">
+         <i nz-icon nzType="lock"
+            nzTheme="outline"></i>
+        </span>-->
 
-    <span (click)="showSearchModal()" *appScreenLessHidden="'320'" class="bst-header-icon" nz-tooltip nzTooltipTitle="{{'COMPONENTS.HEAD_RIGHT_MENU.SEARCH' | translate}}" nzTooltipPlacement="bottom">
-      <i nz-icon nzType="search" nzTheme="outline"></i>
+    <span *appScreenLessHidden="'320'" class="bst-header-icon" nz-tooltip nzTooltipPlacement="bottom" nzTooltipTitle="{{'COMPONENTS.HEAD_RIGHT_MENU.SEARCH' | translate}}" (click)="showSearchModal()">
+      <i nz-icon nzTheme="outline" nzType="search"></i>
     </span>
     <!--注释的是一个弹出外连接的按钮-->
     <!-- <span *appScreenLessHidden="'375'" class="bst-header-icon" nz-tooltip nzTooltipTitle="OnChat的帮助文档"
@@ -16,50 +18,72 @@
            </span>-->
     <span
       *appScreenLessHidden="'393'"
+      #toogleFullScreenDir="appToggleFullscreen"
       class="bst-header-icon"
       appToggleFullscreen
-      #toogleFullScreenDir="appToggleFullscreen"
       nz-tooltip
-      [nzTooltipTitle]="toogleFullScreenDir.isFullscreenFlag ? ('COMPONENTS.HEAD_RIGHT_MENU.ENTER_FULLSCREEN' | translate) : ('COMPONENTS.HEAD_RIGHT_MENU.EXIT_FULLSCREEN' | translate)"
       nzTooltipPlacement="bottom"
+      [nzTooltipTitle]="toogleFullScreenDir.isFullscreenFlag ? ('COMPONENTS.HEAD_RIGHT_MENU.ENTER_FULLSCREEN' | translate) : ('COMPONENTS.HEAD_RIGHT_MENU.EXIT_FULLSCREEN' | translate)"
     >
-      <i nz-icon *ngIf="toogleFullScreenDir.isFullscreenFlag; else exitFullTpl" nzType="fullscreen" nzTheme="outline"></i>
-      <ng-template #exitFullTpl>
-        <i nz-icon nzType="fullscreen-exit" nzTheme="outline"></i>
-      </ng-template>
+      @if (toogleFullScreenDir.isFullscreenFlag) {
+        <i nz-icon nzTheme="outline" nzType="fullscreen"></i>
+      } @else {
+        <i nz-icon nzTheme="outline" nzType="fullscreen-exit"></i>
+      }
+    </span>
+
+    <span class="bst-header-icon" nz-dropdown nzPlacement="bottomRight" nzTrigger="click" [nzDropdownMenu]="noticeMenu">
+      <nz-badge class="bst-badge" [nzCount]="11">
+        <i nz-icon nzTheme="outline" nzType="bell"></i>
+      </nz-badge>
     </span>
     <span class="bst-header-icon" nz-dropdown [nzDropdownMenu]="userSettingMenu">
-      <img class="avatar" src="assets/imgs/default_face.png" alt="" />
+      <img class="avatar" alt="" src="assets/imgs/default_face.png" />
       <span class="base-font-size">Serati Ma</span>
     </span>
     <nz-dropdown-menu #userSettingMenu>
       <ul nz-menu>
+        <li nz-menu-item (click)="goPage('personal-center')">
+          <i class="m-r-8" nz-icon nzTheme="outline" nzType="user"></i>
+          <span>Personal Center</span>
+        </li>
+        <li nz-menu-item (click)="goPage('personal-setting')">
+          <i class="m-r-8" nz-icon nzTheme="outline" nzType="setting"></i>
+          <span>Personal Setting</span>
+        </li>
         <li nz-menu-item (click)="changePassWorld()">
-          <a>
-            <i nz-icon nzType="lock" nzTheme="outline" class="m-r-8"></i>
-            <span>{{'WIDGETS.LIST.CHANGE_PASSWORD' | translate}}</span>
-          </a>
+          <i class="m-r-8" nz-icon nzTheme="outline" nzType="lock"></i>
+          <span>{{'WIDGETS.LIST.CHANGE_PASSWORD' | translate}}</span>
         </li>
         <li nz-menu-divider></li>
         <li nz-menu-item (click)="clean()">
-          <a>
-            <i nz-icon nzType="clear" nzTheme="outline" class="m-r-8"></i>
-            <span>{{'WIDGETS.LIST.CLEAR_CACHE' | translate}}</span>
-          </a>
+          <i class="m-r-8" nz-icon nzTheme="outline" nzType="clear"></i>
+          <span>{{'WIDGETS.LIST.CLEAR_CACHE' | translate}}</span>
         </li>
         <li nz-menu-item (click)="lockScreen()">
-          <a>
-            <i nz-icon nzType="lock" nzTheme="outline" class="m-r-8"></i>
-            <span>{{'WIDGETS.LIST.LOCK_SCREEN' | translate}}</span>
-          </a>
+          <i class="m-r-8" nz-icon nzTheme="outline" nzType="lock"></i>
+          <span>{{'WIDGETS.LIST.LOCK_SCREEN' | translate}}</span>
         </li>
         <li nz-menu-item>
-          <a (click)="goLogin()">
-            <i nz-icon nzType="logout" nzTheme="outline" class="m-r-8"></i>
+          <div (click)="goLogin()">
+            <i class="m-r-8" nz-icon nzTheme="outline" nzType="logout"></i>
             <span>{{'WIDGETS.LIST.LOGOUT' | translate}}</span>
-          </a>
+          </div>
         </li>
       </ul>
     </nz-dropdown-menu>
+
+    <span class="bst-header-icon" nz-dropdown [nzDropdownMenu]="language">
+      <i nz-icon nzTheme="outline" nzType="font-size"></i>
+    </span>
+    <nz-dropdown-menu #language="nzDropdownMenu">
+      <ul nz-menu nzSelectable>
+        <li nz-menu-item nzSelected (click)="showMessage()">English</li>
+        <li nz-menu-item (click)="showMessage()">ภาษาไทย</li>
+      </ul>
+    </nz-dropdown-menu>
   </div>
+  <nz-dropdown-menu #noticeMenu="nzDropdownMenu">
+    <app-home-notice></app-home-notice>
+  </nz-dropdown-menu>
 </ng-template>

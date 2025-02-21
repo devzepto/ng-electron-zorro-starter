@@ -2,7 +2,7 @@ import { FormArray, FormGroup } from '@angular/forms';
 import { ActivatedRouteSnapshot } from '@angular/router';
 
 import { LockScreenFlag } from '@store/common-store/lock-screen-store.service';
-import CryptoJS from 'crypto-js';
+import * as CryptoJS from 'crypto-js';
 import { endOfDay, startOfDay } from 'date-fns';
 import { NzSafeAny } from 'ng-zorro-antd/core/types';
 import { silentEvent } from 'ng-zorro-antd/core/util';
@@ -138,7 +138,14 @@ const fnEndOfDay = function EndOfDay(time: number): number {
   return endOfDay(time).getTime();
 };
 
+// weak-theme 转换为 weakTheme
+// https://blog.csdn.net/weixin_39238200/article/details/125665052
+const fnFormatToHump = function formatToHump(value: string): string {
+  return value.replace(/\-(\w)/g, (_, letter) => letter.toUpperCase());
+};
+
 export {
+  fnFormatToHump,
   fnGetReuseStrategyKeyFn,
   fnDecrypt,
   fnEncrypt,

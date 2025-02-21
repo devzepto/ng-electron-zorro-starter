@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { DestroyRef, inject, Injectable } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
@@ -11,7 +12,6 @@ import { Menu } from '@core/services/types';
 import { LoginService } from '@services/login/login.service';
 import { MenuStoreService } from '@store/common-store/menu-store.service';
 import { UserInfo, UserInfoService } from '@store/common-store/userInfo.service';
-import { getDeepReuseStrategyKeyFn } from '@utils/tools';
 import { fnFlatDataHasParentToTree } from '@utils/treeTableTools';
 
 /*
@@ -21,42 +21,75 @@ import { fnFlatDataHasParentToTree } from '@utils/treeTableTools';
   providedIn: 'root'
 })
 export class LoginInOutService {
-  constructor(
-    private activatedRoute: ActivatedRoute,
-    private tabService: TabService,
-    private loginService: LoginService,
-    private router: Router,
-    private userInfoService: UserInfoService,
-    private menuService: MenuStoreService,
-    private windowServe: WindowService
-  ) {}
+  private destroyRef = inject(DestroyRef);
+  private activatedRoute = inject(ActivatedRoute);
+  private tabService = inject(TabService);
+  private loginService = inject(LoginService);
+  private router = inject(Router);
+  private userInfoService = inject(UserInfoService);
+  private menuService = inject(MenuStoreService);
+  private windowServe = inject(WindowService);
 
   // 通过用户Id来获取菜单数组
   getMenuByUserId(userId: number): Observable<Menu[]> {
     return this.loginService.getMenuByUserId(userId);
   }
 
-  loginIn(token: string): Promise<void> {
+  // version 17 to be clear #awaitdelete
+  // loginIn(token: string): Promise<void> {
+  //   return new Promise(resolve => {
+  //     // 将 token 持久化缓存，请注意，如果没有缓存，则会在路由守卫中被拦截，不让路由跳转
+  //     // 这个路由守卫在src/app/core/services/common/guard/judgeLogin.guard.ts
+  //     this.windowServe.setSessionStorage(TokenKey, TokenPre + token);
+  //     // 解析token ，然后获取用户信息
+  //     const userInfo: UserInfo = this.userInfoService.parsToken(TokenPre + token);
+  //     // todo  这里是手动添加静态页面标签页操作中打开详情的按钮的权限，因为他们涉及到路由跳转，会走路由守卫，但是权限又没有通过后端管理，所以下面两行手动添加权限，实际操作中可以删除下面2行
+  //     userInfo.authCode.push(ActionCode.TabsDetail);
+  //     userInfo.authCode.push(ActionCode.SearchTableDetail);
+  //     // 将用户信息缓存到全局service中
+  //     this.userInfoService.setUserInfo(userInfo);
+  //     // 通过用户id来获取这个用户所拥有的menu
+  //     this.getMenuByUserId(userInfo.userId)
+  //       .pipe(
+  //         finalize(() => {
+  //           resolve();
+  //         }),
+  //         takeUntilDestroyed(this.destroyRef)
+  //       )
+  //       .subscribe(menus => {
+  //         menus = menus.filter(item => {
+  //           item.selected = false;
+  //           item.open = false;
+  //           return item.menuType === 'C';
+  //         });
+  //         const temp = fnFlatDataHasParentToTree(menus);
+  //         // 存储menu
+  //         this.menuService.setMenuArrayStore(temp);
+  //         resolve();
+  //       });
+  //   });
+  // }
+
+  loginIn(token?: string): Promise<void> {
     return new Promise(resolve => {
       // 将 token 持久化缓存，请注意，如果没有缓存，则会在路由守卫中被拦截，不让路由跳转
-      // 设置守卫的地方在src/app/layout/default/default-routing.module.ts  canActivateChild
       // 这个路由守卫在src/app/core/services/common/guard/judgeLogin.guard.ts
-      this.windowServe.setSessionStorage(TokenKey, TokenPre + token);
+      // this.windowServe.setSessionStorage(TokenKey, TokenPre + token);
       // 解析token ，然后获取用户信息
-      // const userInfo: UserInfo = this.userInfoService.parsToken(TokenPre + token);
-      // 这里是模拟用户信息，实际操作应该是上面两行注释，解析登录接口返回的token，获取用户信息
-      const userInfo: UserInfo = { userId: 1, authCode: [] };
+      //  const userInfo: UserInfo = this.userInfoService.parsToken(TokenPre + token);
       // 将用户信息缓存到全局service中
-      this.userInfoService.setUserInfo(userInfo);
+      // this.userInfoService.setUserInfo(userInfo);
       // 通过用户id来获取这个用户所拥有的menu
-      // 也可以用静态提供的菜单
-      this.getMenuByUserId(userInfo.userId)
+      // this.getMenuByUserId(userInfo.userId)
+      this.getMenuByUserId(1)
         .pipe(
           finalize(() => {
             resolve();
-          })
+          }),
+          takeUntilDestroyed(this.destroyRef)
         )
         .subscribe(menus => {
+          console.log(menus);
           menus = menus.filter(item => {
             item.selected = false;
             item.open = false;
@@ -70,18 +103,32 @@ export class LoginInOutService {
     });
   }
 
-  loginOut(): Promise<void> {
-    return new Promise(resolve => {
-      // 清空tab
-      this.tabService.clearTabs();
-      this.windowServe.removeSessionStorage(TokenKey);
-      SimpleReuseStrategy.handlers = {};
-      SimpleReuseStrategy.scrollHandlers = {};
-      this.menuService.setMenuArrayStore([]);
-      SimpleReuseStrategy.waitDelete = getDeepReuseStrategyKeyFn(this.activatedRoute.snapshot);
-      this.router.navigate(['/login/login-form']).then(() => {
+  // 清除Tab缓存,是与路由复用相关的东西
+  clearTabCash(): Promise<void> {
+    return SimpleReuseStrategy.deleteAllRouteSnapshot(this.activatedRoute.snapshot).then(() => {
+      return new Promise(resolve => {
+        // 清空tab
+        this.tabService.clearTabs();
         resolve();
       });
     });
+  }
+
+  clearSessionCash(): Promise<void> {
+    return new Promise(resolve => {
+      this.windowServe.removeSessionStorage(TokenKey);
+      this.menuService.setMenuArrayStore([]);
+      resolve();
+    });
+  }
+
+  loginOut(): Promise<void> {
+    return this.clearTabCash()
+      .then(() => {
+        return this.clearSessionCash();
+      })
+      .then(() => {
+        this.router.navigate(['/login/login-form']);
+      });
   }
 }

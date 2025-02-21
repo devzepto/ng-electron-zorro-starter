@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { PageInfo, SearchCommonVO } from '../../types';
@@ -7,7 +7,6 @@ import { BaseHttpService } from '../base-http.service';
 /*
  * 用户管理
  * */
-
 export interface User {
   id: number;
   password: string;
@@ -37,7 +36,7 @@ export interface UserPsd {
   providedIn: 'root'
 })
 export class AccountService {
-  constructor(public http: BaseHttpService) {}
+  http = inject(BaseHttpService);
 
   public getAccount(param: SearchCommonVO<User>): Observable<PageInfo<User>> {
     return this.http.post('/user/list/', param);

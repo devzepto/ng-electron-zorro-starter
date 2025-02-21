@@ -1,49 +1,55 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { NgTemplateOutlet } from '@angular/common';
+import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Router } from '@angular/router';
 
 import { LoginInOutService } from '@core/services/common/login-in-out.service';
 import { WindowService } from '@core/services/common/window.service';
-import { TranslateService } from '@ngx-translate/core';
 import { AccountService, UserPsd } from '@services/system/account.service';
-import { SpinService } from '@store/common-store/spin.service';
+import { ScreenLessHiddenDirective } from '@shared/directives/screen-less-hidden.directive';
+import { ToggleFullscreenDirective } from '@shared/directives/toggle-fullscreen.directive';
 import { UserInfoService } from '@store/common-store/userInfo.service';
 import { ModalBtnStatus } from '@widget/base-modal';
 import { ChangePasswordService } from '@widget/biz-widget/change-password/change-password.service';
 import { LockWidgetService } from '@widget/common-widget/lock-widget/lock-widget.service';
 import { SearchRouteService } from '@widget/common-widget/search-route/search-route.service';
+import { NzBadgeModule } from 'ng-zorro-antd/badge';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { ModalOptions } from 'ng-zorro-antd/modal';
+import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
+
+import { HomeNoticeComponent } from '../home-notice/home-notice.component';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-layout-head-right-menu',
   templateUrl: './layout-head-right-menu.component.html',
   styleUrls: ['./layout-head-right-menu.component.less'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true,
+  imports: [TranslateModule, NgTemplateOutlet, ScreenLessHiddenDirective, NzToolTipModule, NzIconModule, NzButtonModule, ToggleFullscreenDirective, NzDropDownModule, NzBadgeModule, NzMenuModule, HomeNoticeComponent]
 })
 export class LayoutHeadRightMenuComponent implements OnInit {
   user!: UserPsd;
 
-  constructor(
-    private router: Router,
-    private changePasswordModalService: ChangePasswordService,
-    private spinService: SpinService,
-    private loginOutService: LoginInOutService,
-    private lockWidgetService: LockWidgetService,
-    private windowServe: WindowService,
-    private activatedRoute: ActivatedRoute,
-    private searchRouteService: SearchRouteService,
-    public message: NzMessageService,
-    private userInfoService: UserInfoService,
-    private accountService: AccountService,
-    private translate: TranslateService,
-  ) {}
+  private router = inject(Router);
+  private changePasswordModalService = inject(ChangePasswordService);
+  private loginOutService = inject(LoginInOutService);
+  private lockWidgetService = inject(LockWidgetService);
+  private windowServe = inject(WindowService);
+  private searchRouteService = inject(SearchRouteService);
+  private message = inject(NzMessageService);
+  private userInfoService = inject(UserInfoService);
+  private accountService = inject(AccountService);
 
   // 锁定屏幕
   lockScreen(): void {
-    const i18nTitle = this.translate.instant('WIDGETS.LOCKSCREEN.TITLE');
     this.lockWidgetService
       .show({
-        nzTitle: i18nTitle,
+        nzTitle: '锁定屏幕',
         nzStyle: { top: '25px' },
         nzWidth: '520px',
         nzFooter: null,
@@ -54,8 +60,7 @@ export class LayoutHeadRightMenuComponent implements OnInit {
 
   // 修改密码
   changePassWorld(): void {
-    const i18nTitle = this.translate.instant('WIDGETS.CHANGE_PASSWORD.TITLE');
-    this.changePasswordModalService.show({ nzTitle: i18nTitle }).subscribe(({ modalValue, status }) => {
+    this.changePasswordModalService.show({ nzTitle: '修改密码' }).subscribe(({ modalValue, status }) => {
       if (status === ModalBtnStatus.Cancel) {
         return;
       }
@@ -93,6 +98,14 @@ export class LayoutHeadRightMenuComponent implements OnInit {
     this.windowServe.clearSessionStorage();
     this.loginOutService.loginOut().then();
     this.message.success('清除成功，请重新登录');
+  }
+
+  showMessage(): void {
+    this.message.info('切换成功');
+  }
+
+  goPage(path: string): void {
+    this.router.navigateByUrl(`/default/page-demo/personal/${path}`);
   }
 
   ngOnInit(): void {}

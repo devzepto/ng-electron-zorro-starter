@@ -1,9 +1,8 @@
 import { DOCUMENT } from '@angular/common';
-import { Inject, Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { first } from 'rxjs/operators';
 
 import { ThemeService } from '@store/common-store/theme.service';
-import { NzSafeAny } from 'ng-zorro-antd/core/types';
 
 const enum ThemeType {
   dark = 'dark',
@@ -17,8 +16,8 @@ const enum ThemeType {
 })
 export class ThemeSkinService {
   currentTheme!: ThemeType;
-
-  constructor(private themesService: ThemeService, @Inject(DOCUMENT) private doc: NzSafeAny) {}
+  private readonly doc = inject(DOCUMENT);
+  private readonly themesService = inject(ThemeService);
 
   reverseTheme(theme: ThemeType): ThemeType {
     return theme === ThemeType.dark ? ThemeType.default : ThemeType.dark;
@@ -44,8 +43,8 @@ export class ThemeSkinService {
     });
   }
 
-  public loadTheme(firstLoad = true): Promise<Event> {
-    if (firstLoad) {
+  public loadTheme(isFirstLoad = true): Promise<Event> {
+    if (isFirstLoad) {
       this.themesService
         .getIsNightTheme()
         .pipe(first())
@@ -54,13 +53,13 @@ export class ThemeSkinService {
         });
     }
     const theme = this.currentTheme;
-    if (firstLoad) {
+    if (isFirstLoad) {
       this.doc.documentElement.classList.add(theme);
     }
     return new Promise<Event>((resolve, reject) => {
       this.loadCss(`${theme}.css`, theme).then(
         e => {
-          if (!firstLoad) {
+          if (!isFirstLoad) {
             this.doc.documentElement.classList.add(theme);
           }
           this.removeUnusedTheme(this.reverseTheme(theme));

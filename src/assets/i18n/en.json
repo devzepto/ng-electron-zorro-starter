@@ -7,7 +7,13 @@
         "USERNAME_PLACEHOLDER": "username",
         "PASSWORD_PLACEHOLDER": "password",
         "SUBMIT_BTN": "Log In",
-        "WARNING": "Please type in your username and password"
+        "WARNING": "Please type in your username and password",
+        "REMEMBER_ME": "Remember Me",
+        "FORGET_PASSWORD": "Forget Password?",
+        "OTHER_LOGIN_METHOD": "Other login methods",
+        "MOBILE_PHONE": "Mobile Phone",
+        "QRCODE": "Qrcode",
+        "REGISTER": "Register"
       },
       "HOME": {
           "TITLE": "App works !",
@@ -43,6 +49,7 @@
       "SHOW_SIDEBAR_HEADER": "Show Sidebar Header",
       "COLOR_MODE": "Color Mode",
       "DARK_MODE": "Dark Mode",
+      "GREY_MODE": "Grey Mode",
       "BLINDNESS_COLOR_MODE": "Blindness Color Mode"
     },
     "TAB": {

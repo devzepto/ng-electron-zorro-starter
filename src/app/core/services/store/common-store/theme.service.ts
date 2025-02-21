@@ -1,20 +1,23 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 
+import { Theme, ThemeMode } from '@app/layout/default/setting-drawer/setting-drawer.component';
+
 export interface SettingInterface {
-  theme: 'dark' | 'light';
-  color: string;
-  mode: 'side' | 'top' | 'mixi';
-  fixedWidth: boolean;
-  colorWeak: boolean;
-  fixedHead: boolean;
-  splitNav: boolean;
-  fixedLeftNav: boolean;
-  fixedTab: boolean;
-  hasTopArea: boolean;
-  hasFooterArea: boolean;
-  hasNavArea: boolean;
-  hasNavHeadArea: boolean;
+  theme: Theme['key']; // 主题模式（暗黑模式，明亮模式）
+  color: string; // 主题色
+  mode: ThemeMode['key']; // 菜单模式（侧边模式，顶部模式，混合模式）
+  colorWeak: boolean; // 色弱
+  greyTheme: boolean; // 灰色模式
+  fixedHead: boolean; // 固定头部
+  splitNav: boolean; // 是否分割菜单（在菜单模式为混合模式时才生效）
+  fixedLeftNav: boolean; // 固定左侧菜单
+  isShowTab: boolean; // 是否展示多页签
+  fixedTab: boolean; // 固定tab页签
+  hasTopArea: boolean; // 是否展示顶部区域
+  hasFooterArea: boolean; // 是否展示底部区域
+  hasNavArea: boolean; // 是否有菜单
+  hasNavHeadArea: boolean; // 菜单是否有菜单头
 }
 
 @Injectable({
@@ -27,8 +30,9 @@ export class ThemeService {
     theme: 'dark',
     color: '#1890FF',
     mode: 'side',
-    fixedWidth: true,
+    isShowTab: true,
     colorWeak: false,
+    greyTheme: false,
     splitNav: false,
     fixedTab: true,
     fixedHead: true,
@@ -40,8 +44,6 @@ export class ThemeService {
   });
 
   private isCollapsed$ = new BehaviorSubject<boolean>(false);
-
-  constructor() {}
 
   // 获取主题参数
   setThemesMode(mode: SettingInterface): void {

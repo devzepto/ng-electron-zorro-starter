@@ -1,19 +1,33 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
-import { Component, OnInit, ChangeDetectionStrategy, ViewChild, OnDestroy, ChangeDetectorRef } from '@angular/core';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { AsyncPipe } from '@angular/common';
+import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ChangeDetectorRef, inject, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormsModule } from '@angular/forms';
 
 import { NormalLoginComponent } from '@app/pages/other-login/normal-login/normal-login.component';
+import { PhoneLoginComponent } from '@app/pages/other-login/phone-login/phone-login.component';
+import { QrLoginComponent } from '@app/pages/other-login/qr-login/qr-login.component';
+import { RegistLoginComponent } from '@app/pages/other-login/regist-login/regist-login.component';
 import { IsNightKey } from '@config/constant';
 import { ThemeSkinService } from '@core/services/common/theme-skin.service';
 import { WindowService } from '@core/services/common/window.service';
 import { AdComponent, DynamicComponent } from '@core/services/types';
+import { TranslateModule } from '@ngx-translate/core';
 import { AdDirective } from '@shared/directives/ad.directive';
 import { Login1StoreService } from '@store/biz-store-service/other-login/login1-store.service';
 import { ThemeService } from '@store/common-store/theme.service';
+import { NzButtonModule } from 'ng-zorro-antd/button';
+import { NzCardModule } from 'ng-zorro-antd/card';
+import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
+import { NzGridModule } from 'ng-zorro-antd/grid';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzMenuModule } from 'ng-zorro-antd/menu';
+import { NzSwitchModule } from 'ng-zorro-antd/switch';
 
 export enum LoginType {
   Normal,
+  Phone,
+  Qr,
   Register
 }
 
@@ -26,13 +40,22 @@ interface LoginFormComponentInterface {
   selector: 'app-login1',
   templateUrl: './login1.component.html',
   styleUrls: ['./login1.component.less'],
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  standalone: true,
+  imports: [TranslateModule, NzGridModule, NzCardModule, NzSwitchModule, FormsModule, NzDropDownModule, NzIconModule, NzButtonModule, NzMenuModule, AsyncPipe, AdDirective]
 })
-export class Login1Component implements OnInit, OnDestroy {
+export class Login1Component implements OnInit {
+  private themesService = inject(ThemeService);
+  private themeSkinService = inject(ThemeSkinService);
+  private windowServe = inject(WindowService);
+  private cdr = inject(ChangeDetectorRef);
+  private login1StoreService = inject(Login1StoreService);
+  private breakpointObserver = inject(BreakpointObserver);
+
   private adHost!: AdDirective;
   isOverModel = true;
   isNightTheme$ = this.themesService.getIsNightTheme();
-
+  destroyRef = inject(DestroyRef);
   @ViewChild(AdDirective) set adHost1(content: AdDirective) {
     if (content) {
       this.adHost = content;
@@ -41,17 +64,12 @@ export class Login1Component implements OnInit, OnDestroy {
     }
   }
 
-  private destory$ = new Subject<void>();
-  formData: LoginFormComponentInterface[] = [{ type: LoginType.Normal, component: new DynamicComponent(NormalLoginComponent, {}) }];
-
-  constructor(
-    private themeSkinService: ThemeSkinService,
-    private windowServe: WindowService,
-    private cdr: ChangeDetectorRef,
-    private login1StoreService: Login1StoreService,
-    private breakpointObserver: BreakpointObserver,
-    private themesService: ThemeService
-  ) {}
+  formData: LoginFormComponentInterface[] = [
+    { type: LoginType.Normal, component: new DynamicComponent(NormalLoginComponent, {}) },
+    { type: LoginType.Phone, component: new DynamicComponent(PhoneLoginComponent, {}) },
+    { type: LoginType.Qr, component: new DynamicComponent(QrLoginComponent, {}) },
+    { type: LoginType.Register, component: new DynamicComponent(RegistLoginComponent, {}) }
+  ];
 
   getCurrentComponent(type: LoginType): LoginFormComponentInterface {
     return this.formData.find(item => item.type === type)!;
@@ -62,6 +80,8 @@ export class Login1Component implements OnInit, OnDestroy {
     viewContainerRef.clear();
     const componentRef = viewContainerRef.createComponent<AdComponent>(adItem.component.component);
     componentRef.instance.data = adItem.component.data;
+    // ngZoneEventCoalescing，ngZoneRunCoalescing例子
+    this.cdr.detectChanges();
   }
 
   changeNight(isNight: boolean): void {
@@ -73,22 +93,22 @@ export class Login1Component implements OnInit, OnDestroy {
   }
 
   subLoginType(): void {
-    this.to(this.getCurrentComponent(LoginType.Normal));
+    this.login1StoreService
+      .getLoginTypeStore()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(res => {
+        this.to(this.getCurrentComponent(res));
+      });
   }
 
   ngOnInit(): void {
     this.breakpointObserver
       .observe(['(max-width: 1200px)'])
-      .pipe(takeUntil(this.destory$))
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(res => {
         this.isOverModel = res.matches;
         this.login1StoreService.setIsLogin1OverModelStore(res.matches);
         this.cdr.detectChanges();
       });
-  }
-
-  ngOnDestroy(): void {
-    this.destory$.next();
-    this.destory$.complete();
   }
 }

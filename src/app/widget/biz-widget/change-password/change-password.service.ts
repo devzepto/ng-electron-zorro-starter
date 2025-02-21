@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 
 import { ChangePasswordComponent } from '@widget/biz-widget/change-password/change-password.component';
@@ -11,13 +11,13 @@ import { ModalWrapService } from '../../base-modal';
   providedIn: 'root'
 })
 export class ChangePasswordService {
-  constructor(private modalWrapService: ModalWrapService) {}
-
-  public show(modalOptions: ModalOptions = {}, params?: object): Observable<any> {
-    return this.modalWrapService.show(this.getContentComponent(), modalOptions, params);
-  }
+  private modalWrapService = inject(ModalWrapService);
 
   protected getContentComponent(): NzSafeAny {
     return ChangePasswordComponent;
+  }
+
+  public show(modalOptions: ModalOptions = {}, params?: object): Observable<any> {
+    return this.modalWrapService.show(this.getContentComponent(), modalOptions, params);
   }
 }
