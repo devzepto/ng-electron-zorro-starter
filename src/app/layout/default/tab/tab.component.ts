@@ -2,6 +2,7 @@ import { Component, ChangeDetectionStrategy, inject, computed } from '@angular/c
 import { Router } from '@angular/router';
 
 import { TabModel, TabService } from '@core/services/common/tab.service';
+import { TranslateModule } from '@ngx-translate/core';
 import { MouseHoverShowDirective } from '@shared/directives/mouse-hover-show.directive';
 import { SplitNavStoreService } from '@store/common-store/split-nav-store.service';
 import { ThemeService } from '@store/common-store/theme.service';
@@ -13,13 +14,14 @@ import { NzContextMenuService, NzDropdownMenuComponent, NzDropdownModule } from 
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { NzTabsModule } from 'ng-zorro-antd/tabs';
+import {TranslatePipe} from "@ngx-translate/core";
 
 @Component({
   selector: 'app-tab',
   templateUrl: './tab.component.html',
   styleUrl: './tab.component.less',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [NzCardModule, NzTabsModule, NzDropdownModule, NzMenuModule, NzButtonModule, MouseHoverShowDirective, NzIconModule]
+  imports: [NzCardModule, NzTabsModule, NzDropdownModule, NzMenuModule, NzButtonModule, MouseHoverShowDirective, NzIconModule, TranslatePipe]
 })
 export class TabComponent {
   private tabService = inject(TabService);

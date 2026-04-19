@@ -117,9 +117,8 @@ export const appConfig: ApplicationConfig = {
         prefix: './assets/i18n/',
         suffix: '.json'
       }),
-      fallbackLang: 'en',
-      lang: 'en',
-      defaultLanguage: environment.i18n
+      fallbackLang: environment.i18n,
+      lang: 'en'
     }),
     importProvidersFrom(NzDrawerModule, NzModalModule),
     ...interceptors, // http拦截器

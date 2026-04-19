@@ -8,6 +8,7 @@ import { SimpleReuseStrategy } from '@core/services/common/reuse-strategy';
 import { TabService } from '@core/services/common/tab.service';
 import { ThemeSkinService } from '@core/services/common/theme-skin.service';
 import { WindowService } from '@core/services/common/window.service';
+import { TranslatePipe } from '@ngx-translate/core';
 import { SettingInterface, StyleTheme, StyleThemeInterface, ThemeService } from '@store/common-store/theme.service';
 import { fnFormatToHump } from '@utils/tools';
 
@@ -50,7 +51,7 @@ type SettingKey = Exclude<keyof SettingInterface, ExcludedKeys>;
   templateUrl: './setting-drawer.component.html',
   styleUrl: './setting-drawer.component.less',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [CdkDrag, NzIconModule, NzButtonModule, NzDrawerModule, NzTooltipModule, NzDividerModule, NzListModule, NzSwitchModule, FormsModule]
+  imports: [CdkDrag, NzIconModule, NzButtonModule, NzDrawerModule, NzTooltipModule, NzDividerModule, NzListModule, NzSwitchModule, FormsModule, TranslatePipe]
 })
 export class SettingDrawerComponent implements OnInit {
   private themesService = inject(ThemeService);
@@ -91,13 +92,13 @@ export class SettingDrawerComponent implements OnInit {
   themes: Theme[] = [
     {
       key: 'dark',
-      image: 'imgs/theme-dark.svg',
+      image: 'assets/imgs/theme-dark.svg',
       title: '暗色菜单风格',
       isChecked: true
     },
     {
       key: 'light',
-      image: 'imgs/theme-light.svg',
+      image: 'assets/imgs/theme-light.svg',
       title: '亮色菜单风格',
       isChecked: false
     }
@@ -155,19 +156,19 @@ export class SettingDrawerComponent implements OnInit {
   modes: ThemeMode[] = [
     {
       key: 'side',
-      image: 'imgs/menu-side.svg',
+      image: 'assets/imgs/menu-side.svg',
       title: '侧边菜单布局',
       isChecked: true
     },
     {
       key: 'top',
-      image: 'imgs/menu-top.svg',
+      image: 'assets/imgs/menu-top.svg',
       title: '顶部菜单布局',
       isChecked: false
     },
     {
       key: 'mixin',
-      image: 'imgs/menu-top.svg',
+      image: 'assets/imgs/menu-mixin.svg',
       title: '混合菜单布局',
       isChecked: false
     }
