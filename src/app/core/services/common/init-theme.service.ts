@@ -1,22 +1,9 @@
-import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { first } from 'rxjs/operators';
+import { DestroyRef, inject, Injectable } from '@angular/core';
 
-import { IsNightKey, ThemeOptionsKey } from '@config/constant';
-import { ThemeService } from '@store/common-store/theme.service';
-import { NzSafeAny } from 'ng-zorro-antd/core/types';
+import { StyleThemeModelKey, ThemeOptionsKey } from '@config/constant';
+import { StyleTheme, ThemeService } from '@store/common-store/theme.service';
 
 import { WindowService } from './window.service';
-
-type setThemeProp = 'setIsNightTheme' | 'setThemesMode';
-type getThemeProp = 'getIsNightTheme' | 'getThemesMode';
-
-interface InitThemeOption {
-  storageKey: string;
-  setMethodName: setThemeProp;
-  getMethodName: getThemeProp;
-}
-
 /*
  * 初始化theme
  * */
@@ -26,30 +13,19 @@ interface InitThemeOption {
 export class InitThemeService {
   private themesService = inject(ThemeService);
   private windowServe = inject(WindowService);
-
-  themeInitOption: InitThemeOption[] = [
-    {
-      storageKey: IsNightKey,
-      setMethodName: 'setIsNightTheme',
-      getMethodName: 'getIsNightTheme'
-    },
-    {
-      storageKey: ThemeOptionsKey,
-      setMethodName: 'setThemesMode',
-      getMethodName: 'getThemesMode'
-    }
-  ];
+  destroyRef = inject(DestroyRef);
 
   initTheme(): Promise<void> {
     return new Promise(resolve => {
-      this.themeInitOption.forEach(item => {
-        const hasCash = this.windowServe.getStorage(item.storageKey);
-        if (hasCash) {
-          this.themesService[item.setMethodName](JSON.parse(hasCash));
-        } else {
-          (this.themesService[item.getMethodName]() as Observable<NzSafeAny>).pipe(first()).subscribe(res => this.windowServe.setStorage(item.storageKey, JSON.stringify(res)));
-        }
-      });
+      const themeStyleCash = this.windowServe.getStorage(StyleThemeModelKey);
+      if (themeStyleCash) {
+        this.themesService.$themeStyle.set(themeStyleCash as StyleTheme);
+      }
+
+      const themeOptionsCash = this.windowServe.getStorage(ThemeOptionsKey);
+      if (themeOptionsCash) {
+        this.themesService.$themesOptions.set(JSON.parse(themeOptionsCash));
+      }
       return resolve();
     });
   }

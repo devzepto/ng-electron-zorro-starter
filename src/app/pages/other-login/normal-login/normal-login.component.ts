@@ -42,17 +42,10 @@ export class NormalLoginComponent implements OnInit {
   }
 
   goOtherWay(type: LoginType): void {
-    this.login1StoreService.setLoginTypeStore(type);
+   this.login1StoreService.$loginTypeStore.set(type);
   }
 
   ngOnInit(): void {
-    this.login1StoreService
-      .getIsLogin1OverModelStore()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(res => {
-        this.isOverModel = res;
-        this.cdr.markForCheck();
-      });
     this.validateForm = this.fb.group({
       userName: [null, [Validators.required]],
       password: [null, [Validators.required]],

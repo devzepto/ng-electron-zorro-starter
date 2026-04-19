@@ -1,8 +1,8 @@
 import { DOCUMENT, registerLocaleData } from '@angular/common';
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import en from '@angular/common/locales/en';
-import { APP_INITIALIZER, ApplicationConfig, importProvidersFrom } from '@angular/core';
-import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { ApplicationConfig, EnvironmentProviders, importProvidersFrom, inject, provideAppInitializer, provideBrowserGlobalErrorListeners } from '@angular/core';
+// import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideRouter, RouteReuseStrategy, TitleStrategy, withComponentInputBinding, withHashLocation, withInMemoryScrolling, withPreloading } from '@angular/router';
 
 import { DashboardOutline, FormOutline, MenuFoldOutline, MenuUnfoldOutline } from '@ant-design/icons-angular/icons';
@@ -23,18 +23,14 @@ import { NZ_I18N, en_US } from 'ng-zorro-antd/i18n';
 import { NZ_ICONS } from 'ng-zorro-antd/icon';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 
-import {TranslateModule, TranslateLoader} from "@ngx-translate/core";
-import {TranslateHttpLoader} from '@ngx-translate/http-loader';
+import {TranslateModule, TranslateLoader, provideTranslateService} from "@ngx-translate/core";
+import {provideTranslateHttpLoader, TranslateHttpLoader} from '@ngx-translate/http-loader';
 import {HttpClient} from '@angular/common/http';
 import { environment } from '@env/environment';
 
 const icons = [MenuFoldOutline, MenuUnfoldOutline, DashboardOutline, FormOutline];
 
 registerLocaleData(en);
-
-export function createTranslateLoader(http: HttpClient) {
-  return new TranslateHttpLoader(http, './assets/i18n/', '.json');
-}
 
 export function StartupServiceFactory(startupService: StartupService) {
   return () => startupService.load();
@@ -58,55 +54,44 @@ export function SubWindowWithServiceFactory(subWindowWithService: SubWindowWithS
   return () => subWindowWithService.subWindowWidth();
 }
 
-const APPINIT_PROVIDES = [
+const APPINIT_PROVIDES: EnvironmentProviders[] = [
   // 项目启动
-  {
-    provide: APP_INITIALIZER,
-    useFactory: StartupServiceFactory,
-    deps: [StartupService],
-    multi: true
-  },
+  provideAppInitializer(() => {
+    const initializerFn = StartupServiceFactory(inject(StartupService));
+    return initializerFn();
+  }),
   // load阿里图标库cdn
-  {
-    provide: APP_INITIALIZER,
-    useFactory: LoadAliIconCdnFactory,
-    deps: [LoadAliIconCdnService],
-    multi: true
-  },
+  provideAppInitializer(() => {
+    const initializerFn = LoadAliIconCdnFactory(inject(LoadAliIconCdnService));
+    return initializerFn();
+  }),
   // 初始化锁屏服务
-  {
-    provide: APP_INITIALIZER,
-    useFactory: InitLockedStatusServiceFactory,
-    deps: [SubLockedStatusService],
-    multi: true
-  },
+  provideAppInitializer(() => {
+    const initializerFn = InitLockedStatusServiceFactory(inject(SubLockedStatusService));
+    return initializerFn();
+  }),
   // 初始化主题
-  {
-    provide: APP_INITIALIZER,
-    useFactory: InitThemeServiceFactory,
-    deps: [InitThemeService],
-    multi: true
-  },
+  provideAppInitializer(() => {
+    const initializerFn = InitThemeServiceFactory(inject(InitThemeService));
+    return initializerFn();
+  }),
   // 初始化监听屏幕宽度服务
-  {
-    provide: APP_INITIALIZER,
-    useFactory: SubWindowWithServiceFactory,
-    deps: [SubWindowWithService],
-    multi: true
-  },
+  provideAppInitializer(() => {
+    const initializerFn = SubWindowWithServiceFactory(inject(SubWindowWithService));
+    return initializerFn();
+  }),
   // 初始化暗黑模式还是default模式的css
-  {
-    provide: APP_INITIALIZER,
-    useFactory: (themeService: ThemeSkinService) => () => {
+  provideAppInitializer(() => {
+    const initializerFn = ((themeService: ThemeSkinService) => () => {
       return themeService.loadTheme();
-    },
-    deps: [ThemeSkinService],
-    multi: true
-  }
+    })(inject(ThemeSkinService));
+    return initializerFn();
+  })
 ];
 
 export const appConfig: ApplicationConfig = {
   providers: [
+     provideBrowserGlobalErrorListeners(),
     { provide: RouteReuseStrategy, useClass: SimpleReuseStrategy, deps: [DOCUMENT, ScrollService] }, // 路由复用
     {
       provide: TitleStrategy, // 相关资料：https://dev.to/brandontroberts/setting-page-titles-natively-with-the-angular-router-393j
@@ -126,17 +111,19 @@ export const appConfig: ApplicationConfig = {
       withHashLocation(), // 使用哈希路由
       withComponentInputBinding() // 开启路由参数绑定到组件的输入属性,ng16新增特性
     ),
-    importProvidersFrom(NzDrawerModule, NzModalModule, TranslateModule.forRoot({
-      defaultLanguage: environment.i18n,
-      loader: {
-        provide: TranslateLoader,
-        useFactory: (createTranslateLoader),
-        deps: [HttpClient],
-      },
-    })),
+    provideHttpClient(),
+    provideTranslateService({
+      loader: provideTranslateHttpLoader({
+        prefix: './assets/i18n/',
+        suffix: '.json'
+      }),
+      fallbackLang: 'en',
+      lang: 'en',
+      defaultLanguage: environment.i18n
+    }),
+    importProvidersFrom(NzDrawerModule, NzModalModule),
     ...interceptors, // http拦截器
     ...APPINIT_PROVIDES, // 项目启动之前，需要调用的一系列方法
-    provideAnimationsAsync(), // 开启延迟加载动画，ng17新增特性，如果想要项目启动时就加载动画，可以使用provideAnimations()
     provideHttpClient(withInterceptorsFromDi())
   ]
 };

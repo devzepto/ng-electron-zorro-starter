@@ -1,7 +1,7 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { AsyncPipe } from '@angular/common';
-import { Component, OnInit, ChangeDetectionStrategy, ViewChild, ChangeDetectorRef, inject, DestroyRef } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Component, OnInit, ChangeDetectionStrategy, viewChild, ChangeDetectorRef, inject, DestroyRef, computed, effect } from '@angular/core';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 
 import { NormalLoginComponent } from '@app/pages/other-login/normal-login/normal-login.component';
@@ -23,6 +23,7 @@ import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
 import { NzSwitchModule } from 'ng-zorro-antd/switch';
+import { map } from 'rxjs/operators';
 
 export enum LoginType {
   Normal,
@@ -44,7 +45,7 @@ interface LoginFormComponentInterface {
   standalone: true,
   imports: [TranslateModule, NzGridModule, NzCardModule, NzSwitchModule, FormsModule, NzDropDownModule, NzIconModule, NzButtonModule, NzMenuModule, AsyncPipe, AdDirective]
 })
-export class Login1Component implements OnInit {
+export class Login1Component {
   private themesService = inject(ThemeService);
   private themeSkinService = inject(ThemeSkinService);
   private windowServe = inject(WindowService);
@@ -52,17 +53,15 @@ export class Login1Component implements OnInit {
   private login1StoreService = inject(Login1StoreService);
   private breakpointObserver = inject(BreakpointObserver);
 
-  private adHost!: AdDirective;
-  isOverModel = true;
-  isNightTheme$ = this.themesService.getIsNightTheme();
+  readonly adHost = viewChild.required(AdDirective);
+  isOverModel = toSignal(
+    this.breakpointObserver.observe(['(max-width: 1200px)']).pipe(
+      map(res => res.matches)
+    ),
+    { initialValue: true }
+  );
+  $isNightTheme = computed(() => this.themesService.$isNightTheme());
   destroyRef = inject(DestroyRef);
-  @ViewChild(AdDirective) set adHost1(content: AdDirective) {
-    if (content) {
-      this.adHost = content;
-      this.subLoginType();
-      this.cdr.detectChanges();
-    }
-  }
 
   formData: LoginFormComponentInterface[] = [
     { type: LoginType.Normal, component: new DynamicComponent(NormalLoginComponent, {}) },
@@ -71,12 +70,22 @@ export class Login1Component implements OnInit {
     { type: LoginType.Register, component: new DynamicComponent(RegistLoginComponent, {}) }
   ];
 
+  changePageTypeEffect = effect(() => {
+    this.to(this.getCurrentComponent(this.login1StoreService.$loginTypeStore()));
+  });
+
+  // Sync isOverModel to store using effect
+  syncIsOverModelEffect = effect(() => {
+    this.login1StoreService.isLogin1OverModelSignalStore.set(this.isOverModel());
+  });
+
   getCurrentComponent(type: LoginType): LoginFormComponentInterface {
     return this.formData.find(item => item.type === type)!;
   }
 
+
   to(adItem: LoginFormComponentInterface): void {
-    const viewContainerRef = this.adHost.viewContainerRef;
+    const viewContainerRef = this.adHost().viewContainerRef;
     viewContainerRef.clear();
     const componentRef = viewContainerRef.createComponent<AdComponent>(adItem.component.component);
     componentRef.instance.data = adItem.component.data;
@@ -85,30 +94,9 @@ export class Login1Component implements OnInit {
   }
 
   changeNight(isNight: boolean): void {
-    this.windowServe.setStorage(IsNightKey, `${isNight}`);
-    this.themesService.setIsNightTheme(isNight);
-    this.themeSkinService.toggleTheme().then(() => {
-      this.cdr.markForCheck();
-    });
-  }
-
-  subLoginType(): void {
-    this.login1StoreService
-      .getLoginTypeStore()
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(res => {
-        this.to(this.getCurrentComponent(res));
-      });
-  }
-
-  ngOnInit(): void {
-    this.breakpointObserver
-      .observe(['(max-width: 1200px)'])
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(res => {
-        this.isOverModel = res.matches;
-        this.login1StoreService.setIsLogin1OverModelStore(res.matches);
-        this.cdr.detectChanges();
-      });
+    const mode = isNight ? 'dark' : 'default';
+    this.windowServe.setStorage('StyleThemeModelKey', mode);
+    this.themesService.$themeStyle.set(mode);
+    this.themeSkinService.toggleTheme();
   }
 }

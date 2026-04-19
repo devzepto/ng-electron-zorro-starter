@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { computed, Injectable, signal } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 import { Theme, ThemeMode } from '@app/layout/default/setting-drawer/setting-drawer.component';
@@ -20,13 +20,21 @@ export interface SettingInterface {
   hasNavHeadArea: boolean; // 菜单是否有菜单头
 }
 
+export type StyleTheme = 'default' | 'dark' | 'aliyun' | 'compact'; // 默认主题，暗黑主题，阿里云主题，紧凑主题
+
+// 主题风格
+export type StyleThemeInterface = Record<StyleTheme, boolean>;
+
 @Injectable({
   providedIn: 'root'
 })
 export class ThemeService {
-  private isNightTheme$ = new BehaviorSubject<boolean>(false);
-  private isOverModeTheme$ = new BehaviorSubject<boolean>(false);
-  private themesMode$ = new BehaviorSubject<SettingInterface>({
+  $themeStyle = signal<StyleTheme>('default'); // 主题风格，暗黑，默认，紧凑，阿里云
+  $isNightTheme = computed(() => this.$themeStyle() === 'dark'); // 暗黑主题
+  $isCompactTheme = computed(() => this.$themeStyle() === 'compact'); // 紧凑主题
+  $isOverModeTheme = signal(false); // over模式，即拖动浏览器宽度，至菜单栏消失的状态
+  $isCollapsed = signal(false); // 菜单收缩模式，拖动浏览器至菜单自动缩短成图标
+  $themesOptions = signal<SettingInterface>({
     theme: 'dark',
     color: '#1890FF',
     mode: 'side',
@@ -42,42 +50,62 @@ export class ThemeService {
     hasNavArea: true,
     hasNavHeadArea: true
   });
-
-  private isCollapsed$ = new BehaviorSubject<boolean>(false);
-
-  // 获取主题参数
-  setThemesMode(mode: SettingInterface): void {
-    this.themesMode$.next(mode);
-  }
-
-  getThemesMode(): Observable<SettingInterface> {
-    return this.themesMode$.asObservable();
-  }
-
-  // 主题是否是暗色主题
-  setIsNightTheme(isNight: boolean): void {
-    this.isNightTheme$.next(isNight);
-  }
-
-  getIsNightTheme(): Observable<boolean> {
-    return this.isNightTheme$.asObservable();
-  }
-
-  // 主题是否over侧边栏
-  setIsOverMode(isNight: boolean): void {
-    this.isOverModeTheme$.next(isNight);
-  }
-
-  getIsOverMode(): Observable<boolean> {
-    return this.isOverModeTheme$.asObservable();
-  }
-
-  // 菜单是否折叠
-  setIsCollapsed(isCollapsed: boolean): void {
-    this.isCollapsed$.next(isCollapsed);
-  }
-
-  getIsCollapsed(): Observable<boolean> {
-    return this.isCollapsed$.asObservable();
-  }
 }
+// export class ThemeService {
+//   private isNightTheme$ = new BehaviorSubject<boolean>(false);
+//   private isOverModeTheme$ = new BehaviorSubject<boolean>(false);
+//   private themesMode$ = new BehaviorSubject<SettingInterface>({
+//     theme: 'dark',
+//     color: '#1890FF',
+//     mode: 'side',
+//     isShowTab: true,
+//     colorWeak: false,
+//     greyTheme: false,
+//     splitNav: false,
+//     fixedTab: true,
+//     fixedHead: true,
+//     fixedLeftNav: true,
+//     hasTopArea: true,
+//     hasFooterArea: true,
+//     hasNavArea: true,
+//     hasNavHeadArea: true
+//   });
+
+//   private isCollapsed$ = new BehaviorSubject<boolean>(false);
+
+//   // 获取主题参数
+//   setThemesMode(mode: SettingInterface): void {
+//     this.themesMode$.next(mode);
+//   }
+
+//   getThemesMode(): Observable<SettingInterface> {
+//     return this.themesMode$.asObservable();
+//   }
+
+//   // 主题是否是暗色主题
+//   setIsNightTheme(isNight: boolean): void {
+//     this.isNightTheme$.next(isNight);
+//   }
+
+//   getIsNightTheme(): Observable<boolean> {
+//     return this.isNightTheme$.asObservable();
+//   }
+
+//   // 主题是否over侧边栏
+//   setIsOverMode(isNight: boolean): void {
+//     this.isOverModeTheme$.next(isNight);
+//   }
+
+//   getIsOverMode(): Observable<boolean> {
+//     return this.isOverModeTheme$.asObservable();
+//   }
+
+//   // 菜单是否折叠
+//   setIsCollapsed(isCollapsed: boolean): void {
+//     this.isCollapsed$.next(isCollapsed);
+//   }
+
+//   getIsCollapsed(): Observable<boolean> {
+//     return this.isCollapsed$.asObservable();
+//   }
+// }

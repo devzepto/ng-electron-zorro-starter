@@ -1,5 +1,4 @@
-import { inject, Injectable } from '@angular/core';
-import { first } from 'rxjs/operators';
+import { DestroyRef, inject, Injectable } from '@angular/core';
 
 import { LockedKey, salt } from '@config/constant';
 import { WindowService } from '@core/services/common/window.service';
@@ -13,17 +12,16 @@ import { fnDecrypt, fnEncrypt } from '@utils/tools';
 export class SubLockedStatusService {
   private windowSer = inject(WindowService);
   private lockScreenStoreService = inject(LockScreenStoreService);
+  destroyRef = inject(DestroyRef);
 
   initLockedStatus(): void {
     // 判断是否有缓存
     const hasCash = this.windowSer.getSessionStorage(LockedKey);
     if (hasCash) {
-      this.lockScreenStoreService.setLockScreenStore(fnDecrypt(hasCash, salt));
+      this.lockScreenStoreService.lockScreenSignalStore.set(fnDecrypt(hasCash, salt));
     } else {
-      this.lockScreenStoreService
-        .getLockScreenStore()
-        .pipe(first())
-        .subscribe(res => this.windowSer.setSessionStorage(LockedKey, fnEncrypt(JSON.stringify(res), salt)));
+      const lockScreenInfo = this.lockScreenStoreService.lockScreenSignalStore();
+      this.windowSer.setSessionStorage(LockedKey, fnEncrypt(JSON.stringify(lockScreenInfo), salt));
     }
   }
 }

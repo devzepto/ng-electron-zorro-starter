@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy, inject } from '@angular/core';
+import { Component, ChangeDetectionStrategy, inject } from '@angular/core';
 import { NonNullableFormBuilder, Validators, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { of } from 'rxjs';
@@ -8,6 +8,7 @@ import { WindowService } from '@core/services/common/window.service';
 import { LockScreenFlag, LockScreenStoreService } from '@store/common-store/lock-screen-store.service';
 import { fnCheckForm, fnEncrypt } from '@utils/tools';
 import { BasicConfirmModalComponent } from '@widget/base-modal';
+
 import { NzAvatarModule } from 'ng-zorro-antd/avatar';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzSafeAny } from 'ng-zorro-antd/core/types';
@@ -21,26 +22,22 @@ import { NzModalRef } from 'ng-zorro-antd/modal';
 @Component({
   selector: 'app-lock-widget',
   templateUrl: './lock-widget.component.html',
-  styleUrls: ['./lock-widget.component.less'],
+  styleUrl: './lock-widget.component.less',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [NzAvatarModule, FormsModule, NzFormModule, ReactiveFormsModule, NzGridModule, NzButtonModule, NzInputModule, NzIconModule, NzWaveModule]
 })
-export class LockWidgetComponent extends BasicConfirmModalComponent implements OnInit {
+export class LockWidgetComponent extends BasicConfirmModalComponent {
   private fb = inject(NonNullableFormBuilder);
   private windowSrv = inject(WindowService);
   private lockScreenStoreService = inject(LockScreenStoreService);
   private activatedRoute = inject(ActivatedRoute);
   private router = inject(Router);
+  override modalRef = inject(NzModalRef);
 
   validateForm = this.fb.group({
     password: ['', [Validators.required]]
   });
   passwordVisible = false;
-
-  constructor(protected override modalRef: NzModalRef) {
-    super(modalRef);
-  }
 
   submitForm(): void {
     if (!fnCheckForm(this.validateForm)) {
@@ -52,15 +49,13 @@ export class LockWidgetComponent extends BasicConfirmModalComponent implements O
       // @ts-ignore
       beforeLockPath: this.activatedRoute.snapshot['_routerState'].url
     };
-    this.lockScreenStoreService.setLockScreenStore(lockedState);
+    this.lockScreenStoreService.lockScreenSignalStore.set(lockedState);
     this.windowSrv.setSessionStorage(LockedKey, fnEncrypt(lockedState, salt));
     this.modalRef.destroy();
     this.router.navigateByUrl(`/blank/empty-for-lock`);
   }
 
-  ngOnInit(): void {}
-
-  protected getCurrentValue(): NzSafeAny {
+  override getCurrentValue(): NzSafeAny {
     return of(true);
   }
 }

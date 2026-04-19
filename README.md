@@ -1,12 +1,12 @@
 # Introduction
 
 Ng-Zorro Admin Starter Template (Angular-Electron)
-Bootstrap and package your project with Angular 16 and Electron 25 (Typescript + SASS + Hot Reload) for creating Desktop applications.
+Bootstrap and package your project with Angular 21 and Electron 40 (Typescript + SASS + Hot Reload) for creating Desktop applications.
 
 Currently runs with:
 
-- Angular v17.3.6
-- Electron v30.0.1
+- Angular v21.2.0
+- Electron v40.0.0
 
 
 With this sample, you can:

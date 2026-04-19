@@ -1,6 +1,6 @@
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { DestroyRef, inject, Injectable } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { switchMap } from 'rxjs/operators';
 
 import { SideCollapsedMaxWidth, TopCollapsedMaxWidth } from '@config/constant';
@@ -12,7 +12,7 @@ import { EquipmentWidth, WindowsWidthService } from '@store/common-store/windows
   providedIn: 'root'
 })
 export class SubWindowWithService {
-  subWidthObj: { [key: string]: [EquipmentWidth, [number, number]] } = {
+  subWidthObj: Record<string, [EquipmentWidth, [number, number]]> = {
     '(max-width: 575.98px)': [EquipmentWidth.xs, [0, 575.98]],
     '(min-width: 576px) and (max-width: 767.98px)': [EquipmentWidth.sm, [576, 767.98]],
     '(min-width: 768px) and (max-width: 991.98px)': [EquipmentWidth.md, [768, 991.98]],
@@ -24,11 +24,11 @@ export class SubWindowWithService {
   private winWidthService = inject(WindowsWidthService);
   private breakpointObserver = inject(BreakpointObserver);
   private themesService = inject(ThemeService);
-
+  // todo signal 修正
+  themesOptions$ = toObservable(this.themesService.$themesOptions);
   // 监听主题（是top，还是side），确定over模式最小宽度
   subWidthForTheme(): void {
-    this.themesService
-      .getThemesMode()
+    this.themesOptions$
       .pipe(
         switchMap(res => {
           let maxWidth = '';
@@ -44,10 +44,10 @@ export class SubWindowWithService {
       )
       .subscribe(result => {
         const isOverMode = result.matches;
-        this.themesService.setIsOverMode(isOverMode);
+        this.themesService.$isOverModeTheme.set(isOverMode);
         // 是over模式，展开折叠状态得左侧菜单
         if (isOverMode) {
-          this.themesService.setIsCollapsed(false);
+          this.themesService.$isCollapsed.set(false);
         }
       });
   }
@@ -71,7 +71,7 @@ export class SubWindowWithService {
       .subscribe(res => {
         Object.keys(res.breakpoints).forEach(item => {
           if (res.breakpoints[item]) {
-            this.winWidthService.setWindowWidthStore(this.subWidthObj[item][0]);
+            this.winWidthService.$windowWidth.set(this.subWidthObj[item][0]);
           }
         });
       });
@@ -81,6 +81,6 @@ export class SubWindowWithService {
     this.subWidthForTheme();
     this.subWidthForStore();
     // 初始化的时候就设置当前节点
-    this.winWidthService.setWindowWidthStore(this.judgeWindowsWidth(window.innerWidth));
+    this.winWidthService.$windowWidth.set(this.judgeWindowsWidth(window.innerWidth));
   }
 }

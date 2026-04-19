@@ -1,11 +1,10 @@
-import { DOCUMENT } from '@angular/common';
-import { DestroyRef, inject } from '@angular/core';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { computed, DestroyRef, inject, DOCUMENT } from '@angular/core';
 import { ActivatedRouteSnapshot, DetachedRouteHandle, RouteReuseStrategy } from '@angular/router';
 
 import { ScrollService } from '@core/services/common/scroll.service';
 import { ThemeService } from '@store/common-store/theme.service';
 import { fnGetReuseStrategyKeyFn, getDeepReuseStrategyKeyFn } from '@utils/tools';
+
 import { NzSafeAny } from 'ng-zorro-antd/core/types';
 
 export type ReuseHookTypes = '_onReuseInit' | '_onReuseDestroy';
@@ -28,16 +27,18 @@ export class SimpleReuseStrategy implements RouteReuseStrategy {
   private readonly scrollService = inject(ScrollService);
 
   // 缓存每个component的map
-  static handlers: { [key: string]: NzSafeAny } = {};
+  static handlers: Record<string, NzSafeAny> = {};
   // 缓存每个页面的scroll位置,为啥不放在handlers里面呢,因为路由离开时路由复用导致以当前页为key为null了
-  static scrollHandlers: { [key: string]: NzSafeAny } = {};
+  static scrollHandlers: Record<string, NzSafeAny> = {};
 
   // 这个参数的目的是，在当前页签中点击删除按钮，虽然页签关闭了，但是在路由离开的时候，还是会将已经关闭的页签的组件缓存，
   // 用这个参数来记录，是否需要缓存当前路由
   public static waitDelete: string | null;
-
+  themesService = inject(ThemeService); // 用于获取主题
   // 是否有多页签，没有多页签则不做路由缓存
-  isShowTab$ = inject(ThemeService).getThemesMode();
+  $isShowTab = computed(() => {
+    return this.themesService.$themesOptions().isShowTab;
+  });
 
   public static deleteRouteSnapshot(key: string): void {
     if (SimpleReuseStrategy.handlers[key]) {
@@ -63,11 +64,25 @@ export class SimpleReuseStrategy implements RouteReuseStrategy {
   // 是否允许复用路由
   shouldDetach(route: ActivatedRouteSnapshot): boolean {
     // 是否展示多页签，如果不展示多页签，则不做路由复用
-    let isShowTab = false;
-    this.isShowTab$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(res => {
-      isShowTab = res.isShowTab;
-    });
-    return route.data['shouldDetach'] !== 'no' && isShowTab;
+    const shouldDetach = route.data['shouldDetach'] !== 'no' && this.$isShowTab();
+    // 在此处记录滚动位置：shouldDetach 在 outlet.detach() 之前调用，DOM 还在文档中
+    // 修改记录滚动位置的时机，如果放在路由离开时才记录，会造成获取不到dom
+    if (shouldDetach && route.data['needKeepScroll'] !== 'no') {
+      const key = fnGetReuseStrategyKeyFn(route);
+      if (key) {
+        const innerScrollContainer: Record<string, [number, number]>[] = [];
+        const scrollContain: string[] = route.data['scrollContain'] ?? [];
+        scrollContain.forEach(item => {
+          const el = this.doc.querySelector(item);
+          if (el) {
+            innerScrollContainer.push({ [item]: this.scrollService.getScrollPosition(el) });
+          }
+        });
+        innerScrollContainer.push({ window: this.scrollService.getScrollPosition() });
+        SimpleReuseStrategy.scrollHandlers[key] = { scroll: innerScrollContainer };
+      }
+    }
+    return shouldDetach;
   }
 
   // 当路由离开时会触发，存储路由
@@ -85,22 +100,7 @@ export class SimpleReuseStrategy implements RouteReuseStrategy {
       return;
     }
 
-    // 离开路由的时候缓存当前页面的scroll位置
-    // 默认都需要keepScroll，如果不需要keepScroll才添加needKeepScroll:no属性
-    const innerScrollContainer = [];
-    if (route.data['needKeepScroll'] !== 'no') {
-      const scrollContain = route.data['scrollContain'] ?? [];
-      scrollContain.forEach((item: string) => {
-        const el = this.doc.querySelector(item)!;
-        if (el) {
-          const position = this.scrollService.getScrollPosition(el);
-          innerScrollContainer.push({ [item]: position });
-        }
-      });
-      innerScrollContainer.push({ window: this.scrollService.getScrollPosition() });
-    }
-
-    SimpleReuseStrategy.scrollHandlers[key] = { scroll: innerScrollContainer };
+    // 滚动位置已在 shouldDetach 时提前记录，此处 DOM 可能已被移除，不再操作
     SimpleReuseStrategy.handlers[key] = handle;
 
     if (handle && handle.componentRef) {
@@ -115,7 +115,10 @@ export class SimpleReuseStrategy implements RouteReuseStrategy {
   }
 
   // 获取存储路由
-  retrieve(route: ActivatedRouteSnapshot): DetachedRouteHandle {
+  // 如果在这里获取目标路由组件的实例，执行生命周期，会导致组件的生命周期执行多次（大于等于2次），但是这样又能避免shouldReuseRoute里面用while
+  // https://github.com/angular/angular/issues/43251
+  // https://github.com/angular/angular/issues/42794
+  retrieve(route: ActivatedRouteSnapshot): DetachedRouteHandle | null {
     const key = fnGetReuseStrategyKeyFn(route);
     return !key ? null : SimpleReuseStrategy.handlers[key];
   }
@@ -136,7 +139,7 @@ export class SimpleReuseStrategy implements RouteReuseStrategy {
     // 重新获取是因为future在上面while循环中已经变了
     const scrollFutureKey = fnGetReuseStrategyKeyFn(future);
     if (!!scrollFutureKey && SimpleReuseStrategy.scrollHandlers[scrollFutureKey]) {
-      SimpleReuseStrategy.scrollHandlers[scrollFutureKey].scroll.forEach((elOptionItem: { [key: string]: [number, number] }) => {
+      SimpleReuseStrategy.scrollHandlers[scrollFutureKey].scroll.forEach((elOptionItem: Record<string, [number, number]>) => {
         Object.keys(elOptionItem).forEach(element => {
           setTimeout(() => {
             this.scrollService.scrollToPosition(this.doc.querySelector(element), elOptionItem[element]);
@@ -148,10 +151,10 @@ export class SimpleReuseStrategy implements RouteReuseStrategy {
   }
 
   runHook(method: ReuseHookTypes, comp: ReuseComponentRef): void {
-    const compThis = comp.instance;
-    if (comp == null || !compThis) {
+    if (comp == null || !comp.instance) {
       return;
     }
+    const compThis = comp.instance;
     const fn = compThis[method];
     if (typeof fn !== 'function') {
       return;

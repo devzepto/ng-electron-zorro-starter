@@ -1,5 +1,4 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { Injectable, signal } from '@angular/core';
 
 /**
  * 用于存储对话框是否是全屏状态的service
@@ -10,13 +9,5 @@ import { BehaviorSubject, Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class ModalFullStatusStoreService {
-  private modalFullStatusStore$ = new BehaviorSubject<boolean>(false);
-
-  setModalFullStatusStore(store: boolean): void {
-    this.modalFullStatusStore$.next(store);
-  }
-
-  getModalFullStatusStore(): Observable<boolean> {
-    return this.modalFullStatusStore$.asObservable();
-  }
+  $modalFullStatusStore = signal(false);
 }

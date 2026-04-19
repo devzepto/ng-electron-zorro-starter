@@ -1,4 +1,4 @@
-import { ComponentRef, DestroyRef, Inject, inject, Injectable, Injector, TemplateRef, Type } from '@angular/core';
+import { ComponentRef, DestroyRef, inject, Injectable, Injector, Signal, TemplateRef, Type } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Observable, of } from 'rxjs';
 import { map, tap } from 'rxjs/operators';
@@ -6,7 +6,6 @@ import { map, tap } from 'rxjs/operators';
 import { GLOBAL_DRAWER_FOOT_TPL_TOKEN } from '@app/tpl/global-drawer-foot-tpl/global-drawer-foot-tpl-token';
 import { GlobalDrawerFootTplComponentToken } from '@app/tpl/global-drawer-foot-tpl/global-drawer-foot-tpl.component';
 import { ModalBtnStatus } from '@widget/base-modal';
-import * as _ from 'lodash';
 import { NzSafeAny } from 'ng-zorro-antd/core/types';
 import { NzDrawerOptions, NzDrawerRef, NzDrawerService } from 'ng-zorro-antd/drawer';
 
@@ -17,10 +16,10 @@ export class DrawerWrapService {
   private baseInjector = inject(Injector);
   private btnComponentRef: ComponentRef<GlobalDrawerFootTplComponentToken> = inject(GLOBAL_DRAWER_FOOT_TPL_TOKEN);
   protected bsDrawerService: NzDrawerService = this.baseInjector.get(NzDrawerService);
-  private btnTpl: TemplateRef<any> = this.btnComponentRef.instance.componentTpl;
+  private btnTpl: Signal<TemplateRef<NzSafeAny>> = this.btnComponentRef.instance.componentTpl;
   constructor() {
-    this.btnComponentRef.instance.sureEmitter.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.sure());
-    this.btnComponentRef.instance.cancelEmitter.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(() => this.cancel());
+    this.btnComponentRef.instance.sureEmitter!.subscribe(() => this.sure());
+    this.btnComponentRef.instance.cancelEmitter!.subscribe(() => this.cancel());
   }
 
   show(component: Type<NzSafeAny>, drawerOptions: NzDrawerOptions = {}, params: object = {}): Observable<NzSafeAny> {
@@ -40,9 +39,9 @@ export class DrawerWrapService {
       nzContentParams: {
         params
       },
-      nzFooter: drawerOptions.nzFooter || this.btnTpl
+      nzFooter: drawerOptions.nzFooter || this.btnTpl()
     };
-    return _.merge(defaultOptions, drawerOptions);
+    return { ...defaultOptions, ...drawerOptions };
   }
 
   sure(): void {

@@ -8,6 +8,8 @@ export const TokenKey = 'Authorization';
 export const IsNightKey = 'IsNightKey';
 // 主题设置key
 export const ThemeOptionsKey = 'ThemeOptionsKey';
+// 主题风格模式key，阿里云、紧凑、默认、暗黑
+export const StyleThemeModelKey = 'StyleThemeModelKey';
 // 用于记录是否是第一次加载
 export const IsFirstLogin = 'IsFirstLogin';
 // 锁屏key

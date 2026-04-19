@@ -1,35 +1,26 @@
-import { Directive, inject, Input, TemplateRef, ViewContainerRef } from '@angular/core';
+import { computed, Directive, effect, inject, input, TemplateRef, ViewContainerRef } from '@angular/core';
 
 import { UserInfoService } from '@store/common-store/userInfo.service';
-import { NzSafeAny } from 'ng-zorro-antd/core/types';
 
 @Directive({
   selector: '[appAuth]',
-  standalone: true
 })
 export class AuthDirective {
-  codeArray!: string[];
+  readonly appAuth = input.required<string>();
 
-  private userInfoService = inject(UserInfoService);
-  private templateRef = inject(TemplateRef);
-  private viewContainerRef = inject(ViewContainerRef);
+  private readonly userInfoService = inject(UserInfoService);
+  private readonly templateRef = inject(TemplateRef);
+  private readonly viewContainerRef = inject(ViewContainerRef);
 
-  @Input('appAuth')
-  set appAuth(authCode: string | undefined) {
-    if (!authCode) {
-      this.show(true);
-      return;
-    }
-    this.codeArray.includes(authCode) ? this.show(true) : this.show(false);
-  }
+  private readonly hasAuth = computed(() => {
+    const code = this.appAuth();
+    if (!code) return true;
+    return this.userInfoService.$userInfo().authCode.includes(code);
+  });
 
   constructor() {
-    this.userInfoService.getUserInfo().subscribe(userInfo => {
-      this.codeArray = userInfo.authCode;
+    effect(() => {
+      this.hasAuth() ? this.viewContainerRef.createEmbeddedView(this.templateRef) : this.viewContainerRef.clear();
     });
-  }
-
-  private show(hasAuth: boolean): void {
-    hasAuth ? this.viewContainerRef.createEmbeddedView(this.templateRef) : this.viewContainerRef.clear();
   }
 }

@@ -5,6 +5,7 @@ import { catchError } from 'rxjs/operators';
 
 import { LoginService } from '@core/services/http/login/login.service';
 import { fnCheckForm } from '@utils/tools';
+
 import { NzSafeAny } from 'ng-zorro-antd/core/types';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzGridModule } from 'ng-zorro-antd/grid';
@@ -17,7 +18,6 @@ import { BasicConfirmModalComponent } from '../../base-modal';
   selector: 'app-login-modal',
   templateUrl: './login-modal.component.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
   imports: [FormsModule, NzFormModule, ReactiveFormsModule, NzGridModule, NzInputModule]
 })
 export class LoginModalComponent extends BasicConfirmModalComponent implements OnInit {
@@ -25,13 +25,10 @@ export class LoginModalComponent extends BasicConfirmModalComponent implements O
 
   private fb = inject(FormBuilder);
   private loginService = inject(LoginService);
-
-  constructor(protected override modalRef: NzModalRef) {
-    super(modalRef);
-  }
+  override modalRef = inject(NzModalRef);
 
   // 返回false则不关闭对话框
-  protected getCurrentValue(): Observable<NzSafeAny> {
+  override getCurrentValue(): Observable<NzSafeAny> {
     if (!fnCheckForm(this.loginModalForm)) {
       return of(false);
     }

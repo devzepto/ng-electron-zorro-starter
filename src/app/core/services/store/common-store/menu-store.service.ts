@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 
 import { Menu } from '@core/services/types';
@@ -8,13 +8,13 @@ import { Menu } from '@core/services/types';
   providedIn: 'root'
 })
 export class MenuStoreService {
-  private menuArray$ = new BehaviorSubject<Menu[]>([]);
+  $menuArray = signal<Menu[]>([]);
 
   setMenuArrayStore(menuArray: Menu[]): void {
-    this.menuArray$.next(menuArray);
+    this.$menuArray.set(menuArray);
   }
 
-  getMenuArrayStore(): Observable<Menu[]> {
-    return this.menuArray$.asObservable();
-  }
+  // getMenuArrayStore(): Observable<Menu[]> {
+  //   return this.$menuArray
+  // }
 }

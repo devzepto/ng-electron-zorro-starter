@@ -24,13 +24,13 @@
       "prefix": "app",
       "architect": {
         "build": {
-          "builder": "@angular-builders/custom-webpack:browser",
+          "builder": "@angular-devkit/build-angular:application",
           "options": {
             "outputPath": "dist",
             "index": "src/index.html",
-            "main": "src/main.ts",
+            "browser": "src/main.ts",
             "tsConfig": "src/tsconfig.app.json",
-            "polyfills": "src/polyfills.ts",
+            "polyfills": ["src/polyfills.ts"],
             "inlineStyleLanguage": "less",
             "assets": [
               "src/favicon.ico",
@@ -63,23 +63,18 @@
               "includePaths": ["src/styles/themes"]
             },
             "scripts": [
-                "node_modules/driver.js/dist/driver.js.iife.js"
+              "node_modules/driver.js/dist/driver.js.iife.js"
             ],
-            "customWebpackConfig": {
-              "path": "./angular.webpack.js",
-              "replaceDuplicatePlugins": true
-            }
+            "allowedCommonJsDependencies": [
+              "crypto-js"
+            ]
           },
           "configurations": {
             "dev": {
               "optimization": false,
               "outputHashing": "none",
               "sourceMap": true,
-              "namedChunks": false,
-              "aot": false,
               "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": false,
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
@@ -91,11 +86,7 @@
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
-              "namedChunks": false,
-              "aot": true,
               "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
@@ -107,11 +98,7 @@
               "optimization": false,
               "outputHashing": "none",
               "sourceMap": true,
-              "namedChunks": false,
-              "aot": false,
               "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": false,
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
@@ -123,11 +110,7 @@
               "optimization": true,
               "outputHashing": "all",
               "sourceMap": false,
-              "namedChunks": false,
-              "aot": true,
               "extractLicenses": true,
-              "vendorChunk": false,
-              "buildOptimizer": true,
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
@@ -138,22 +121,22 @@
           }
         },
         "serve": {
-          "builder": "@angular-builders/custom-webpack:dev-server",
+          "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "ng-electron-zorro-starter:build"
+            "buildTarget": "ng-electron-zorro-starter:build"
           },
           "configurations": {
             "dev": {
-              "browserTarget": "ng-electron-zorro-starter:build:dev"
+              "buildTarget": "ng-electron-zorro-starter:build:dev"
             },
             "production": {
-              "browserTarget": "ng-electron-zorro-starter:build:production"
+              "buildTarget": "ng-electron-zorro-starter:build:production"
             },
             "web": {
-              "browserTarget": "ng-electron-zorro-starter:build:web"
+              "buildTarget": "ng-electron-zorro-starter:build:web"
             },
             "web-production": {
-              "browserTarget": "ng-electron-zorro-starter:build:web-production"
+              "buildTarget": "ng-electron-zorro-starter:build:web-production"
             }
           }
         },
@@ -164,11 +147,9 @@
           }
         },
         "test": {
-          "builder": "@angular-builders/jest:run",
+          "builder": "@angular-devkit/build-angular:jest",
           "options": {
-            "polyfills": ["src/polyfills-test.ts"],
-            "tsConfig": "src/tsconfig.spec.json",
-            "globalMocks": ["styleTransform", "matchMedia", "getComputedStyle"]
+            "tsConfig": "src/tsconfig.spec.json"
           }
         },
         "lint": {

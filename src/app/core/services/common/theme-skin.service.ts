@@ -1,13 +1,7 @@
-import { DOCUMENT } from '@angular/common';
-import { inject, Injectable } from '@angular/core';
-import { first } from 'rxjs/operators';
+import { computed, inject, Injectable, DOCUMENT } from '@angular/core';
 
-import { ThemeService } from '@store/common-store/theme.service';
+import { StyleTheme, ThemeService } from '@store/common-store/theme.service';
 
-const enum ThemeType {
-  dark = 'dark',
-  default = 'default'
-}
 /*
  * 切换主题服务
  * */
@@ -15,18 +9,14 @@ const enum ThemeType {
   providedIn: 'root'
 })
 export class ThemeSkinService {
-  currentTheme!: ThemeType;
   private readonly doc = inject(DOCUMENT);
   private readonly themesService = inject(ThemeService);
+  private $currentStyleTheme = computed(() => this.themesService.$themeStyle());
 
-  reverseTheme(theme: ThemeType): ThemeType {
-    return theme === ThemeType.dark ? ThemeType.default : ThemeType.dark;
-  }
-
-  removeUnusedTheme(theme: ThemeType): void {
-    this.doc.documentElement.classList.remove(theme);
+  removeUnusedTheme(theme: StyleTheme): void {
     const removedThemeStyle = this.doc.getElementById(theme);
     if (removedThemeStyle) {
+      this.doc.documentElement.classList.remove(theme);
       this.doc.head.removeChild(removedThemeStyle);
     }
   }
@@ -44,15 +34,7 @@ export class ThemeSkinService {
   }
 
   public loadTheme(isFirstLoad = true): Promise<Event> {
-    if (isFirstLoad) {
-      this.themesService
-        .getIsNightTheme()
-        .pipe(first())
-        .subscribe(res => {
-          this.currentTheme = res ? ThemeType.dark : ThemeType.default;
-        });
-    }
-    const theme = this.currentTheme;
+    const theme = this.$currentStyleTheme();
     if (isFirstLoad) {
       this.doc.documentElement.classList.add(theme);
     }
@@ -62,7 +44,14 @@ export class ThemeSkinService {
           if (!isFirstLoad) {
             this.doc.documentElement.classList.add(theme);
           }
-          this.removeUnusedTheme(this.reverseTheme(theme));
+          (['default', 'aliyun', 'compact', 'dark'] as StyleTheme[])
+            .filter(item => item !== this.$currentStyleTheme())
+            .forEach(item => {
+              setTimeout(() => {
+                this.removeUnusedTheme(item as StyleTheme);
+              }, 1);
+            });
+
           resolve(e);
         },
         e => reject(e)
@@ -71,7 +60,6 @@ export class ThemeSkinService {
   }
 
   public toggleTheme(): Promise<Event> {
-    this.currentTheme = this.reverseTheme(this.currentTheme);
     return this.loadTheme(false);
   }
 }

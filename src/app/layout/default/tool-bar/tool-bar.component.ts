@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, ChangeDetectionStrategy } from '@angular/core';
 
 @Component({
   selector: 'app-tool-bar',
@@ -8,9 +8,7 @@ import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
       <ng-content select="ng-container[right]" />
     </div>
   `,
-  styleUrls: ['./tool-bar.component.less'],
+  styleUrl: './tool-bar.component.less',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  standalone: true,
-  preserveWhitespaces: false
 })
 export class ToolBarComponent {}

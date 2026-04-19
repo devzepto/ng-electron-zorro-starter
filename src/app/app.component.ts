@@ -1,5 +1,4 @@
-import { AsyncPipe } from '@angular/common';
-import { AfterViewInit, ChangeDetectionStrategy, Component, DestroyRef, inject, OnInit } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, computed, DestroyRef, inject, OnInit } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs/operators';
@@ -8,23 +7,22 @@ import { PreloaderService } from '@core/services/common/preloader.service';
 import { LockScreenComponent } from '@shared/components/lock-screen/lock-screen.component';
 import { LockScreenStoreService } from '@store/common-store/lock-screen-store.service';
 import { SpinService } from '@store/common-store/spin.service';
-import { NzBackTopModule } from 'ng-zorro-antd/back-top';
-import { NzSafeAny } from 'ng-zorro-antd/core/types';
-import { NzSpinModule } from 'ng-zorro-antd/spin';
 
-import { fadeRouteAnimation } from './animations/fade.animation';
+import { NzSafeAny } from 'ng-zorro-antd/core/types';
+import { NzFloatButtonTopComponent } from 'ng-zorro-antd/float-button';
+import { NzSpinModule } from 'ng-zorro-antd/spin';
 
 @Component({
   selector: 'app-root',
   template: `
-    @if ((lockedState$ | async)!.locked) {
+    @if (lockedState()!.locked) {
       <app-lock-screen></app-lock-screen>
     }
-    <nz-back-top></nz-back-top>
-    <div class="full-height" [@fadeRouteAnimation]="prepareRoute(outlet)">
-      <router-outlet #outlet="outlet"></router-outlet>
+    <nz-float-button-top></nz-float-button-top>
+    <div class="full-height">
+      <router-outlet></router-outlet>
     </div>
-    @if (loading$ | async) {
+    @if (loading()) {
       <div style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:1001;background:rgba(24,144,255,0.1);">
         <div style="position:absolute;top: 50%;left:50%;margin:-16px 0 0 -16px;">
           <nz-spin nzSize="large"></nz-spin>
@@ -33,9 +31,7 @@ import { fadeRouteAnimation } from './animations/fade.animation';
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
-  animations: [fadeRouteAnimation],
-  standalone: true,
-  imports: [LockScreenComponent, NzBackTopModule, RouterOutlet, NzSpinModule, AsyncPipe]
+  imports: [LockScreenComponent, RouterOutlet, NzSpinModule, NzFloatButtonTopComponent]
 })
 export class AppComponent implements OnInit, AfterViewInit {
   private preloader = inject(PreloaderService);
@@ -43,13 +39,11 @@ export class AppComponent implements OnInit, AfterViewInit {
   private spinService = inject(SpinService);
   private router = inject(Router);
 
-  loading$ = this.spinService.getCurrentGlobalSpinStore();
-  lockedState$ = this.lockScreenStoreService.getLockScreenStore();
+  loading = computed(() => this.spinService.$globalSpinStore());
+  lockedState = computed(() => {
+    return this.lockScreenStoreService.lockScreenSignalStore();
+  });
   destroyRef = inject(DestroyRef);
-
-  prepareRoute(outlet: RouterOutlet): string {
-    return outlet?.activatedRouteData?.['key'];
-  }
 
   ngOnInit(): void {
     this.router.events
@@ -58,7 +52,7 @@ export class AppComponent implements OnInit, AfterViewInit {
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe(() => {
-        this.spinService.setCurrentGlobalSpinStore(false);
+        this.spinService.$globalSpinStore.set(false);
       });
   }
 

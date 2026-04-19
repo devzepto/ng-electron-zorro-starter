@@ -1,4 +1,4 @@
-import { Directive, Host, inject } from '@angular/core';
+import { Directive, inject } from '@angular/core';
 
 import { NzModalComponent } from 'ng-zorro-antd/modal';
 
@@ -13,8 +13,8 @@ import { ModalDragService } from './modal-drag.service';
  ```
  */
 @Directive({
+  // eslint-disable-next-line @angular-eslint/directive-selector
   selector: 'nz-modal[nzxModalDrag]',
-  standalone: true
 })
 export class ModalDragDirective {
   modalDragService = inject(ModalDragService);
@@ -22,6 +22,8 @@ export class ModalDragDirective {
 
   constructor() {
     const wrapCls = this.modalDragService.getRandomCls();
+    // afterOpen/afterClose 各自只会触发一次，且由 NzModalComponent 自身管理生命周期，
+    // modal 销毁时这些 Observable 会自动 complete，无需 takeUntilDestroyed
     this.modal.afterOpen.subscribe(() => {
       const modelElement = this.modal.getElement()!;
       if (!modelElement || modelElement.className.indexOf(ModalDragService.DRAG_CLS_PREFIX) !== -1) {
